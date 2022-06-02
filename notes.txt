@@ -1,14 +1,14 @@
 Gamerules to do:
 
-Check for Checkmate
 Add castling behavior
 
 
 Other to do:
-Add game end screen - change background to winner color, say winner player name, say checkmate
-Add play again option
 implement cpu mode
-
+possibly optimize finding of valid moves with respect to check:
+	currently each time a piece is clicked, its moves are generated and then filtered by deciding what moves would put it in check
+	could change so that at the beginning of each turn, all moves are calculated, clicking on pieces simply selects certain ones
+	this would make it so that clicking pieces and showing moves is faster
 
 Extras to do:
 

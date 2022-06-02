@@ -2,7 +2,6 @@
 # Authored by Alex Wolfe on 5/29/2022
 
 
-
 import graphics
 import copy
 
@@ -34,10 +33,31 @@ class Text():
         self.block.setSize(15)
         self.block.draw(win)
 
+    def Player1win(self,win,color):
+        self.block.undraw()
+        self.block.setText('Player 1 Wins!')
+        self.block.setTextColor(color)
+        self.block.setSize(20)
+        self.block.draw(win)
+
+    def Player2win(self,win,color):
+        self.block.undraw()
+        self.block.setText('Player 2 Wins!')
+        self.block.setTextColor(color)
+        self.block.setSize(20)
+        self.block.draw(win)
+
     def Check(self,win):
         self.block2.undraw()
         self.block2.setText('Check')
         self.block2.setTextColor('black')
+        self.block2.setSize(22)
+        self.block2.draw(win)
+    
+    def Checkmate(self,win,winnercolor):
+        self.block2.undraw()
+        self.block2.setText('Checkmate!')
+        self.block2.setTextColor(winnercolor)
         self.block2.setSize(22)
         self.block2.draw(win)
 
@@ -471,6 +491,47 @@ class Rook():
 
 # Functions List
 
+def initializeGame(win,board,squaresize,team1color,team2color):
+    board.player1score = 16
+    board.player2score = 16
+    # Create Array of Squares
+    squares = [[Square() for i in range(9)] for i in range(9)]
+    # Iterate through square and set colors
+    for k in range(0,8):
+        for j in range(0,8):
+            if (k+j) % 2:
+                squares[k][j].SetColor(team2color)
+            else:
+                squares[k][j].SetColor(team1color)
+            p1 = graphics.Point(k*squaresize+squaresize,j*squaresize+squaresize)
+            p2 = graphics.Point(p1.x+squaresize,p1.y+squaresize)
+            squares[k][j].Draw(win,p1,p2)
+
+    # Assign Pieces to squares
+    for k in range(0,8):
+        squares[k][6].SetPiece(win,Pawn('player1',[k,6]))
+        squares[k][1].SetPiece(win,Pawn('player2',[k,1]))  
+    squares[0][7].SetPiece(win,Rook('player1',[0,7]))
+    squares[7][7].SetPiece(win,Rook('player1',[7,7]))
+    squares[0][0].SetPiece(win,Rook('player2',[0,0]))
+    squares[7][0].SetPiece(win,Rook('player2',[7,0]))
+    squares[1][7].SetPiece(win,Knight('player1',[1,7]))
+    squares[6][7].SetPiece(win,Knight('player1',[6,7]))
+    squares[1][0].SetPiece(win,Knight('player2',[1,0]))
+    squares[6][0].SetPiece(win,Knight('player2',[6,0]))
+    squares[2][7].SetPiece(win,Bishop('player1',[2,7]))
+    squares[5][7].SetPiece(win,Bishop('player1',[5,7]))
+    squares[2][0].SetPiece(win,Bishop('player2',[2,0]))
+    squares[5][0].SetPiece(win,Bishop('player2',[5,0]))
+    squares[3][7].SetPiece(win,Queen('player1',[3,7]))
+    squares[3][0].SetPiece(win,Queen('player2',[3,0]))
+    kp1 = King('player1',[4,7])
+    kp2 = King('player2',[4,0])
+    squares[4][7].SetPiece(win,kp1)
+    squares[4][0].SetPiece(win,kp2)
+    drawMoveButton(win)
+    return [squares,kp1,kp2]
+
 def CreateWindow(size,color):
     win = graphics.GraphWin('PyChess',size,size)
     win.setBackground(color) 
@@ -630,6 +691,50 @@ def SimulateforCheck(squares,availableprecheck,player,pos):
                     passed.append(availableprecheck[l])
     return passed
 
+def checkForCheckmate(squares,player):
+    # is there any move I can make that gets me out of check?, if no return True
+    for n in range(0,8):
+        for m in range(0,8):
+            if squares[n][m].team == player:
+                moves = squares[n][m].piece.GetMoves(squares,player)
+                remaining = SimulateforCheck(squares,moves,player,squares[n][m].piece.pos)
+                if len(remaining)>0:
+                    return False
+    return True
+
+def gameOver(win,windowsize,color):
+    resetbox = graphics.Rectangle(graphics.Point(windowsize/2-100,windowsize/3-50),graphics.Point(windowsize/2+100,windowsize/3+50))
+    resettext = graphics.Text(graphics.Point((resetbox.p1.x+resetbox.p2.x)/2,(resetbox.p1.y+resetbox.p2.y)/2),'Rematch')
+    endbox = graphics.Rectangle(graphics.Point(windowsize/2-100,2*windowsize/3-50),graphics.Point(windowsize/2+100,2*windowsize/3+50))
+    endtext = graphics.Text(graphics.Point((endbox.p1.x+endbox.p2.x)/2,(endbox.p1.y+endbox.p2.y)/2),'Quit')
+    resetbox.setFill(color)
+    resetbox.setOutline('black')
+    resetbox.setWidth(6)
+    endbox.setFill(color)
+    endbox.setOutline('black')
+    endbox.setWidth(6)
+    resettext.setSize(20)
+    endtext.setSize(20)
+    resetbox.draw(win)
+    resettext.draw(win)
+    endbox.draw(win)
+    endtext.draw(win)
+    while 1:
+        click = win.getMouse()
+        xcoord = int(click.x)
+        ycoord = int(click.y)
+        if xcoord > resetbox.p1.x and xcoord < resetbox.p2.x and ycoord > resetbox.p1.y and ycoord < resetbox.p2.y:
+            resetbox.undraw()
+            resettext.undraw()
+            endbox.undraw()
+            endtext.undraw()
+            return 'newgame'
+        if xcoord > endbox.p1.x and xcoord < endbox.p2.x and ycoord > endbox.p1.y and ycoord < endbox.p2.y:
+            resetbox.undraw()
+            resettext.undraw()
+            endbox.undraw()
+            endtext.undraw()
+            return 'gameover'
 
 # Begin Main Setup
 
@@ -645,62 +750,28 @@ text = Text(windowsize)
 
 mode = StartMenu(win,windowsize)
 
-p1scoreboard = graphics.Text(graphics.Point(130,20),'Player 1 Score')
+p1scoreboard = graphics.Text(graphics.Point(130,60),'Player 1 Pieces')
 p1scoreboard.draw(win)
-p2scoreboard = graphics.Text(graphics.Point(600,20),'Player 2 Score')
+p2scoreboard = graphics.Text(graphics.Point(600,60),'Player 2 Pieces')
 p2scoreboard.draw(win)
 p1score = board.player1score
-p1scorenumber = graphics.Text(graphics.Point(210,20),str(p1score))
+p1scorenumber = graphics.Text(graphics.Point(198,60),str(p1score))
 p1scorenumber.draw(win)
 p2score = board.player2score
-p2scorenumber = graphics.Text(graphics.Point(680,20),str(p2score))
+p2scorenumber = graphics.Text(graphics.Point(668,60),str(p2score))
 p2scorenumber.draw(win)
 
-# Create Array of Squares
-squares = [[Square() for i in range(9)] for i in range(9)]
-# Iterate through square and set colors
-for k in range(0,8):
-    for j in range(0,8):
-        if (k+j) % 2:
-            squares[k][j].SetColor(team2color)
-        else:
-            squares[k][j].SetColor(team1color)
-        p1 = graphics.Point(k*squaresize+squaresize,j*squaresize+squaresize)
-        p2 = graphics.Point(p1.x+squaresize,p1.y+squaresize)
-        squares[k][j].Draw(win,p1,p2)
-
-# Assign Pieces to squares
-for k in range(0,8):
-    squares[k][6].SetPiece(win,Pawn('player1',[k,6]))
-    squares[k][1].SetPiece(win,Pawn('player2',[k,1]))  
-squares[0][7].SetPiece(win,Rook('player1',[0,7]))
-squares[7][7].SetPiece(win,Rook('player1',[7,7]))
-squares[0][0].SetPiece(win,Rook('player2',[0,0]))
-squares[7][0].SetPiece(win,Rook('player2',[7,0]))
-squares[1][7].SetPiece(win,Knight('player1',[1,7]))
-squares[6][7].SetPiece(win,Knight('player1',[6,7]))
-squares[1][0].SetPiece(win,Knight('player2',[1,0]))
-squares[6][0].SetPiece(win,Knight('player2',[6,0]))
-squares[2][7].SetPiece(win,Bishop('player1',[2,7]))
-squares[5][7].SetPiece(win,Bishop('player1',[5,7]))
-squares[2][0].SetPiece(win,Bishop('player2',[2,0]))
-squares[5][0].SetPiece(win,Bishop('player2',[5,0]))
-squares[3][7].SetPiece(win,Queen('player1',[3,7]))
-squares[3][0].SetPiece(win,Queen('player2',[3,0]))
-kp1 = King('player1',[4,7])
-kp2 = King('player2',[4,0])
-squares[4][7].SetPiece(win,kp1)
-squares[4][0].SetPiece(win,kp2)
+[squares,kp1,kp2] = initializeGame(win,board,squaresize,team1color,team2color)
 
 
 # Begin Main Loop
-drawMoveButton(win)
+turn = 'player1'
+text.Player1turn(win)
 while 1:
     moveshapes = []
     available = []
-    turn = 'player1'
-    text.Player1turn(win)
     while turn == 'player1':
+        counter = 0
         UpdateScore(board,p1scorenumber,p2scorenumber)
         click = win.getMouse()
         drawMoveToggle(board,click.x,click.y)
@@ -715,8 +786,19 @@ while 1:
                 Overtake(selected,selected2,board,selected2.team)
             else:
                 Move(selected,selected2)
+            turn = 'player2'
+            if kp1.InCheck(squares) is False:
+                text.block2.undraw()
             if kp2.InCheck(squares):
-                text.Check(win)
+                if checkForCheckmate(squares,turn):
+                    text.Checkmate(win,team1color)
+                    text.Player1win(win,team1color)
+                    win.setBackground(team2color)
+                    turn = gameOver(win,windowsize,team1color)
+                    break
+                else:
+                    text.Check(win)
+            text.Player2turn(win)
             break
         elif squares[col][row].team == turn:
             selected = squares[col][row]
@@ -727,8 +809,7 @@ while 1:
         else:
             available = []
             moveshapes = []
-    turn = 'player2'
-    text.Player2turn(win)
+
     while turn == 'player2':
         UpdateScore(board,p1scorenumber,p2scorenumber)
         click = win.getMouse()
@@ -744,8 +825,19 @@ while 1:
                 Overtake(selected,selected2,board,selected2.team)
             else:
                 Move(selected,selected2)
+            turn = 'player1'
+            if kp2.InCheck(squares) is False:
+                text.block2.undraw()
             if kp1.InCheck(squares):
-                text.Check(win)
+                if checkForCheckmate(squares,turn):
+                    text.Checkmate(win,team1color)
+                    text.Player2win(win,team1color)
+                    win.setBackground(team2color)
+                    turn = gameOver(win,windowsize,team2color)
+                    break
+                else:
+                    text.Check(win)
+            text.Player1turn(win)
             break
         elif squares[col][row].team == turn:
             selected = squares[col][row]
@@ -756,3 +848,12 @@ while 1:
         else:
             available = []
             moveshapes = []
+    if turn == 'gameover':
+        win.close()
+        break
+    if turn == 'newgame':
+            [squares,kp1,kp2] = initializeGame(win,board,squaresize,team1color,team2color)
+            win.setBackground(team1color)
+            text.block2.undraw()
+            turn = 'player1'
+            text.Player1turn(win)
