@@ -1,7 +1,8 @@
 Gamerules to do:
 
 Add castling behavior
-
+add en passant behavior
+pawn promoting
 
 Other to do:
 implement cpu mode

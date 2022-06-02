@@ -61,6 +61,12 @@ class Text():
         self.block2.setSize(22)
         self.block2.draw(win)
 
+    def Promotion(self,win):
+        self.block2.undraw()
+        self.block2.setText('Choose a Piece')
+        self.block2.setTextColor('black')
+        self.block2.setSize(20)
+        self.block2.draw(win)
 
 class Square():
     def __init__(self):
@@ -68,12 +74,12 @@ class Square():
         self.team = 'none'
         self.piece = 'none'
 
-    def Draw(self,win,p1,p2):
+    def Draw(self,win,p1,p2,outline):
         self.p1 = p1
         self.p2 = p2
         square = graphics.Rectangle(p1,p2)
         square.setFill(self.color)
-        square.setOutline('black')
+        square.setOutline(outline)
         square.draw(win)
         self.center = graphics.Point((p1.x+p2.x)/2,(p1.y+p2.y)/2)
 
@@ -494,6 +500,7 @@ class Rook():
 def initializeGame(win,board,squaresize,team1color,team2color):
     board.player1score = 16
     board.player2score = 16
+    drawPromoters(win,squaresize)
     # Create Array of Squares
     squares = [[Square() for i in range(9)] for i in range(9)]
     # Iterate through square and set colors
@@ -505,9 +512,8 @@ def initializeGame(win,board,squaresize,team1color,team2color):
                 squares[k][j].SetColor(team1color)
             p1 = graphics.Point(k*squaresize+squaresize,j*squaresize+squaresize)
             p2 = graphics.Point(p1.x+squaresize,p1.y+squaresize)
-            squares[k][j].Draw(win,p1,p2)
-
-    # Assign Pieces to squares
+            squares[k][j].Draw(win,p1,p2,'black')
+    # Assign Pieces to squares  
     for k in range(0,8):
         squares[k][6].SetPiece(win,Pawn('player1',[k,6]))
         squares[k][1].SetPiece(win,Pawn('player2',[k,1]))  
@@ -531,6 +537,21 @@ def initializeGame(win,board,squaresize,team1color,team2color):
     squares[4][0].SetPiece(win,kp2)
     drawMoveButton(win)
     return [squares,kp1,kp2]
+
+def drawPromoters(win,squaresize):
+    promoters = ['knight_black.png','bishop_black.png','rook_black.png','queen_black.png','knight_white.png','bishop_white.png','rook_white.png','queen_white.png']
+    for i in range(4):
+        p1 = graphics.Point(0,i*squaresize+3*squaresize)
+        p2 = graphics.Point(p1.x+squaresize,p1.y+squaresize)
+        center = graphics.Point((p1.x+p2.x)/2,(p1.y+p2.y)/2)
+        image = graphics.Image(center,promoters[i])
+        graphics.Image.draw(image,win)
+    for k in range(4,8):
+        p1 = graphics.Point(9*squaresize,(k-4)*squaresize+3*squaresize)
+        p2 = graphics.Point(p1.x+squaresize,p1.y+squaresize)
+        center = graphics.Point((p1.x+p2.x)/2,(p1.y+p2.y)/2)
+        image = graphics.Image(center,promoters[k])
+        graphics.Image.draw(image,win)
 
 def CreateWindow(size,color):
     win = graphics.GraphWin('PyChess',size,size)
@@ -628,10 +649,61 @@ def GetClickCoords(click):
     return [col,row]
 
 def Move(selected,selected2):
+    team = selected.team
     selected.piece.pos = [col,row]
     selected.piece.numberofmoves+=1
-    selected2.SetPiece(win,selected.piece)
-    selected.ClearSquare()
+    if (selected.piecetype == 'pawn' and (row == 7 or row == 0)):
+        text.Promotion(win)
+        while 1:
+            click = win.getMouse()
+            [x,y] = GetClickCoords(click)
+            if team == 'player1':
+                match [x,y]:
+                    case [8,2]:
+                        selected2.SetPiece(win,Knight('player1',selected.piece.pos))
+                        selected2.piece.numberofmoves = selected.piece.numberofmoves
+                        selected.ClearSquare()
+                        break
+                    case [8,3]:
+                        selected2.SetPiece(win,Bishop('player1',selected.piece.pos))
+                        selected2.piece.numberofmoves = selected.piece.numberofmoves
+                        selected.ClearSquare()
+                        break
+                    case [8,4]:
+                        selected2.SetPiece(win,Rook('player1',selected.piece.pos))
+                        selected2.piece.numberofmoves = selected.piece.numberofmoves
+                        selected.ClearSquare()
+                        break
+                    case [8,5]:
+                        selected2.SetPiece(win,Queen('player1',selected.piece.pos))
+                        selected2.piece.numberofmoves = selected.piece.numberofmoves
+                        selected.ClearSquare()
+                        break
+            else:
+                match [x,y]:
+                    case [-1,2]:
+                        selected2.SetPiece(win,Knight('player2',selected.piece.pos))
+                        selected2.piece.numberofmoves = selected.piece.numberofmoves
+                        selected.ClearSquare()
+                        break
+                    case [-1,3]:
+                        selected2.SetPiece(win,Bishop('player2',selected.piece.pos))
+                        selected2.piece.numberofmoves = selected.piece.numberofmoves
+                        selected.ClearSquare()
+                        break
+                    case [-1,4]:
+                        selected2.SetPiece(win,Rook('player2',selected.piece.pos))
+                        selected2.piece.numberofmoves = selected.piece.numberofmoves
+                        selected.ClearSquare()
+                        break
+                    case [-1,5]:
+                        selected2.SetPiece(win,Queen('player2',selected.piece.pos))
+                        selected2.piece.numberofmoves = selected.piece.numberofmoves
+                        selected.ClearSquare()
+                        break
+    else:
+        selected2.SetPiece(win,selected.piece)
+        selected.ClearSquare()
 
 def SimMove(selected,selected2,x,y):
     selected.piece.pos = [x,y]
@@ -645,10 +717,68 @@ def Overtake(selected,selected2,board,team):
         board.player2score-=1
     selected.piece.numberofmoves+=1
     selected.piece.pos = selected2.piece.pos
-    selected2.piece.pos = [-1,-1]
-    selected2.ClearSquare()
-    selected2.SetPiece(win,selected.piece)
-    selected.ClearSquare()
+    if (selected.piecetype == 'pawn' and (selected2.piece.row == 7 or selected2.piece.row == 0)):
+        text.Promotion(win)
+        while 1:
+            click = win.getMouse()
+            [x,y] = GetClickCoords(click)
+            if team == 'player1':
+                match [x,y]:
+                    case [-1,3]:
+                        selected2.ClearSquare()
+                        selected2.SetPiece(win,Knight('player1',selected2.piece.pos))
+                        selected2.piece.numberofmoves = selected.piece.numberofmoves
+                        selected.ClearSquare()
+                        break
+                    case [-1,4]:
+                        selected2.ClearSquare()
+                        selected2.SetPiece(win,Bishop('player1',selected2.piece.pos))
+                        selected2.piece.numberofmoves = selected.piece.numberofmoves
+                        selected.ClearSquare()
+                        break
+                    case [-1,5]:
+                        selected2.ClearSquare()
+                        selected2.SetPiece(win,Rook('player1',selected2.piece.pos))
+                        selected2.piece.numberofmoves = selected.piece.numberofmoves
+                        selected.ClearSquare()
+                        break
+                    case [-1,6]:
+                        selected2.ClearSquare()
+                        selected2.SetPiece(win,Queen('player1',selected2.piece.pos))
+                        selected2.piece.numberofmoves = selected.piece.numberofmoves
+                        selected.ClearSquare()
+                        break
+            else:
+                match [x,y]:
+                    case [8,3]:
+                        selected2.ClearSquare()
+                        selected2.SetPiece(win,Knight('player2',selected2.piece.pos))
+                        selected2.piece.numberofmoves = selected.piece.numberofmoves
+                        selected.ClearSquare()
+                        break
+                    case [8,4]:
+                        selected2.ClearSquare()
+                        selected2.SetPiece(win,Bishop('player2',selected2.piece.pos))
+                        selected2.piece.numberofmoves = selected.piece.numberofmoves
+                        selected.ClearSquare()
+                        break
+                    case [8,5]:
+                        selected2.ClearSquare()
+                        selected2.SetPiece(win,Rook('player2',selected2.piece.pos))
+                        selected2.piece.numberofmoves = selected.piece.numberofmoves
+                        selected.ClearSquare()
+                        break
+                    case [8,6]:
+                        selected2.ClearSquare()
+                        selected2.SetPiece(win,Queen('player2',selected2.piece.pos))
+                        selected2.piece.numberofmoves = selected.piece.numberofmoves
+                        selected.ClearSquare()
+                        break
+    else:
+        selected2.piece.pos = [-1,-1]
+        selected2.ClearSquare()
+        selected2.SetPiece(win,selected.piece)
+        selected.ClearSquare()
 
 def SimOvertake(selected,selected2):
     selected.piece.pos = selected2.piece.pos
