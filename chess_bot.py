@@ -924,7 +924,7 @@ while 1:
                     text.Checkmate(win,team1color)
                     text.Player1win(win,team1color)
                     win.setBackground(team2color)
-                    turn = gameOver(win,windowsize,team1color)
+                    turn = gameOver(win,windowsize,'orange')
                     break
                 else:
                     text.Check(win)
@@ -963,7 +963,7 @@ while 1:
                     text.Checkmate(win,team1color)
                     text.Player2win(win,team1color)
                     win.setBackground(team2color)
-                    turn = gameOver(win,windowsize,team2color)
+                    turn = gameOver(win,windowsize,'orange')
                     break
                 else:
                     text.Check(win)
