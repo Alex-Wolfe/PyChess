@@ -1,0 +1,16 @@
+Gamerules to do:
+
+Check for Checkmate
+Add castling behavior
+
+
+Other to do:
+Add game end screen - change background to winner color, say winner player name, say checkmate
+Add play again option
+implement cpu mode
+
+
+Extras to do:
+
+
+
