@@ -4,7 +4,11 @@ Add castling behavior
 add en passant behavior
 
 Other to do:
-implement cpu mode
+implement cpu mode 
+    a simple AI would be to prioritize the following moves
+     1.) Putting enemy in check
+     2.) Taking enemy piece (ranked by piece value in order of queen, rook, bishop, knight, pawn
+     3.) Else, make random move
 possibly optimize finding of valid moves with respect to check:
 	currently each time a piece is clicked, its moves are generated and then filtered by deciding what moves would put it in check
 	could change so that at the beginning of each turn, all moves are calculated, clicking on pieces simply selects certain ones
