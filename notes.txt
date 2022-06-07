@@ -4,7 +4,7 @@ add en passant behavior
 
 
 Other to do:
-add cpu promotion, castling, and en passant
+castling, and en passant
 right now cpu always chooses queen to promote to
 
 
@@ -17,3 +17,5 @@ a simple AI would be to prioritize the following moves
      1.) Putting enemy in check
      2.) Taking enemy piece (ranked by piece value in order of queen, rook, bishop, knight, pawn
      3.) Else, make random move
+
+Note: if a pawn is the most valuable piece the cpu can take, make random move

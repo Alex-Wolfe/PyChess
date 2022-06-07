@@ -674,9 +674,9 @@ def GetClickCoords(click):
 
 def Move(selected,selected2):
     team = selected.team
-    selected.piece.pos = [col,row]
+    selected.piece.pos = selected2.pos
     selected.piece.numberofmoves+=1
-    if (selected.piecetype == 'pawn' and (row == 7 or row == 0)):
+    if (selected.piecetype == 'pawn' and (selected.piece.pos[0] == 7 or selected.piece.pos[1] == 0)):
         text.Promotion(win)
         while True:
             click = win.getMouse()
@@ -729,8 +729,8 @@ def Move(selected,selected2):
         selected2.SetPiece(win,selected.piece)
         selected.ClearSquare()
 
-def SimMove(selected,selected2,x,y):
-    selected.piece.pos = [x,y]
+def SimMove(selected,selected2):
+    selected.piece.pos = selected2.pos
     selected2.SimSetPiece(selected.piece)
     selected.SimClearSquare()
 
@@ -738,15 +738,15 @@ def cpuMove(selected,selected2):
     team = selected.team
     selected.piece.pos = selected2.pos
     selected.piece.numberofmoves+=1
-    if (selected.piecetype == 'pawn' and (row == 7 or row == 0)):
+    if (selected.piecetype == 'pawn' and (selected.piece.pos[0] == 7 or selected.piece.pos[1] == 0)):
         if team == 'player1':
             selected2.ClearSquare()
-            selected2.SetPiece(win,Queen('player1',selected2.piece.pos))
+            selected2.SetPiece(win,Queen('player1',selected2.pos))
             selected2.piece.numberofmoves = selected.piece.numberofmoves
             selected.ClearSquare()
         else:
             selected2.ClearSquare()
-            selected2.SetPiece(win,Queen('player2',selected2.piece.pos))
+            selected2.SetPiece(win,Queen('player2',selected2.pos))
             selected2.piece.numberofmoves = selected.piece.numberofmoves
             selected.ClearSquare()
     else:
@@ -872,7 +872,7 @@ def SimulateforCheck(squares,availableprecheck,player,pos,type):
             if dummyselected2.occupied and dummyselected2.team != player:
                 SimOvertake(dummyselected,dummyselected2)
             else:
-                SimMove(dummyselected,dummyselected2,availableprecheck[l][0],availableprecheck[l][1])
+                SimMove(dummyselected,dummyselected2)
             if player == 'player1':
                 if dummyselected.piecetype == 'king':
                     if dummyselected2.piece.InCheck(dummysquares) is False:
@@ -896,7 +896,7 @@ def SimulateforCheck(squares,availableprecheck,player,pos,type):
             if dummyselected2.occupied and dummyselected2.team != player:
                 SimOvertake(dummyselected,dummyselected2)
             else:
-                SimMove(dummyselected,dummyselected2,availableprecheck[l][0],availableprecheck[l][1])
+                SimMove(dummyselected,dummyselected2)
             if player == 'player1':
                     if kp2.InCheck(dummysquares):
                         passed.append(availableprecheck[l])
@@ -976,7 +976,8 @@ def GetCPUMove(squares):
                     if rank[option.piecetype] > highestvalue:
                         bestovertake = [available[i][0],available[i][1]]
                         bestfrom = selected
-    if len(bestovertake) > 0:
+                        highestvalue = rank[option.piecetype]
+    if len(bestovertake) > 0 and highestvalue > 1:
         return (bestfrom, squares[bestovertake[0]][bestovertake[1]])
     # Else, make random move
     while True:
