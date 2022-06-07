@@ -2,6 +2,7 @@
 # Authored by Alex Wolfe on 5/29/2022
 
 
+from os import fsdecode
 import graphics
 import copy
 import random
@@ -1021,7 +1022,10 @@ p1scorenumber.draw(win)
 p2score = board.player2score
 p2scorenumber = graphics.Text(graphics.Point(668,60),str(p2score))
 p2scorenumber.draw(win)
-
+p1gamescore = 0
+p2gamescore = 0
+gamescore = graphics.Text(graphics.Point(660, 20),(str(p1gamescore),'-',str(p2gamescore)))
+gamescore.draw(win)
 [squares,kp1,kp2] = initializeGame(win,board,squaresize,team1color,team2color)
 
 # Begin Main Loop
@@ -1055,6 +1059,8 @@ while True:
                     text.Checkmate(win,team1color)
                     text.Player1win(win,team1color)
                     win.setBackground(team2color)
+                    p1gamescore+=1
+                    gamescore.setText((str(p1gamescore),'-',str(p2gamescore)))
                     turn = gameOver(win,windowsize,'orange')
                     break
                 else:
@@ -1094,6 +1100,8 @@ while True:
                     text.Checkmate(win,team1color)
                     text.Player2win(win,team1color)
                     win.setBackground(team2color)
+                    p2gamescore+=1
+                    gamescore.setText((str(p1gamescore),'-',str(p2gamescore)))
                     turn = gameOver(win,windowsize,'orange')
                     break
                 else:
@@ -1132,6 +1140,8 @@ while True:
                 text.Checkmate(win,team1color)
                 text.Player2win(win,team1color)
                 win.setBackground(team2color)
+                p2gamescore+=1
+                gamescore.setText((str(p1gamescore),'-',str(p2gamescore)))
                 turn = gameOver(win,windowsize,'orange')
                 break
             else:

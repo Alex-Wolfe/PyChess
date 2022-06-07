@@ -3,12 +3,8 @@ Add castling behavior
 add en passant behavior
 
 
-Other to do:
-castling, and en passant
-right now cpu always chooses queen to promote to
-
-
 Extras to do:
+add 1 move look ahead to cpu to further improve performance
 Add game counter for players that choose to play again
 
 
