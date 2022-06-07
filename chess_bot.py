@@ -4,6 +4,8 @@
 
 import graphics
 import copy
+import random
+import time
 
 # Classes List
 
@@ -73,6 +75,7 @@ class Square():
         self.occupied = False
         self.team = 'none'
         self.piece = 'none'
+        self.pos = [0,0]
 
     def Draw(self,win,p1,p2,outline):
         self.p1 = p1
@@ -503,9 +506,11 @@ def initializeGame(win,board,squaresize,team1color,team2color):
     drawPromoters(win,squaresize)
     # Create Array of Squares
     squares = [[Square() for i in range(9)] for i in range(9)]
+    
     # Iterate through square and set colors
     for k in range(0,8):
         for j in range(0,8):
+            squares[k][j].pos = [k,j]
             if (k+j) % 2:
                 squares[k][j].SetColor(team2color)
             else:
@@ -571,15 +576,19 @@ def StartMenu(win,windowsize):
     text1 = graphics.Text(graphics.Point(windowsize/2,windowsize/2),'2 Player Game')
     rect2 = graphics.Rectangle(graphics.Point(windowsize/2-100,windowsize/2+150-50),graphics.Point(windowsize/2+100,windowsize/2+150+50))
     text2 = graphics.Text(graphics.Point(windowsize/2,windowsize/2+150),'VS Computer')
+    rect3 = graphics.Rectangle(graphics.Point(windowsize/2-50,12*windowsize/13-25),graphics.Point(windowsize/2+50,12*windowsize/13+25))
+    text3 = graphics.Text(graphics.Point(windowsize/2,12*windowsize/13),'Quit')
     header.draw(win)
     name.draw(win)
     kw.draw(win)
     kb.draw(win)
     rect1.draw(win)
     rect2.draw(win)
+    rect3.draw(win)
     text1.draw(win)
     text2.draw(win)
-    while 1:
+    text3.draw(win)
+    while True:
         click = win.getMouse()
         xcoord = int(click.x)
         ycoord = int(click.y)
@@ -589,18 +598,33 @@ def StartMenu(win,windowsize):
             kb.undraw()
             rect1.undraw()
             rect2.undraw()
+            rect3.undraw()
             text1.undraw()
             text2.undraw()
+            text3.undraw()
             return '2player'
-        if xcoord > int(windowsize/2-100) and xcoord < int(windowsize/2+100) and ycoord > int(windowsize/2+150-50) and ycoord < int(windowsize/2+150+50):
+        elif xcoord > int(windowsize/2-100) and xcoord < int(windowsize/2+100) and ycoord > int(windowsize/2+150-50) and ycoord < int(windowsize/2+150+50):
             header.undraw()
             kw.undraw()
             kb.undraw()
             rect1.undraw()
             rect2.undraw()
+            rect3.undraw()
             text1.undraw()
             text2.undraw()
+            text3.undraw()
             return 'cpu'
+        elif xcoord > int(windowsize/2-50) and xcoord < int(windowsize/2+50) and ycoord > int(12*windowsize/13-25) and ycoord < int(12*windowsize/13+25):
+            header.undraw()
+            kw.undraw()
+            kb.undraw()
+            rect1.undraw()
+            rect2.undraw()
+            rect3.undraw()
+            text1.undraw()
+            text2.undraw()
+            text3.undraw()
+            return 'quit'
 
 def drawMoveButton(win):
     box = graphics.Rectangle(graphics.Point(windowsize/2-60,720+10),graphics.Point(windowsize/2+60,720-10))
@@ -654,7 +678,7 @@ def Move(selected,selected2):
     selected.piece.numberofmoves+=1
     if (selected.piecetype == 'pawn' and (row == 7 or row == 0)):
         text.Promotion(win)
-        while 1:
+        while True:
             click = win.getMouse()
             [x,y] = GetClickCoords(click)
             if team == 'player1':
@@ -710,6 +734,25 @@ def SimMove(selected,selected2,x,y):
     selected2.SimSetPiece(selected.piece)
     selected.SimClearSquare()
 
+def cpuMove(selected,selected2):
+    team = selected.team
+    selected.piece.pos = selected2.pos
+    selected.piece.numberofmoves+=1
+    if (selected.piecetype == 'pawn' and (row == 7 or row == 0)):
+        if team == 'player1':
+            selected2.ClearSquare()
+            selected2.SetPiece(win,Queen('player1',selected2.piece.pos))
+            selected2.piece.numberofmoves = selected.piece.numberofmoves
+            selected.ClearSquare()
+        else:
+            selected2.ClearSquare()
+            selected2.SetPiece(win,Queen('player2',selected2.piece.pos))
+            selected2.piece.numberofmoves = selected.piece.numberofmoves
+            selected.ClearSquare()
+    else:
+        selected2.SetPiece(win,selected.piece)
+        selected.ClearSquare()
+
 def Overtake(selected,selected2,board,team):
     if team == 'player1':
         board.player1score-=1
@@ -719,7 +762,7 @@ def Overtake(selected,selected2,board,team):
     selected.piece.pos = selected2.piece.pos
     if (selected.piecetype == 'pawn' and (selected2.piece.row == 7 or selected2.piece.row == 0)):
         text.Promotion(win)
-        while 1:
+        while True:
             click = win.getMouse()
             [x,y] = GetClickCoords(click)
             if team == 'player1':
@@ -787,47 +830,87 @@ def SimOvertake(selected,selected2):
     selected2.SimSetPiece(selected.piece)
     selected.SimClearSquare()
 
+def cpuOvertake(selected,selected2,board,team):
+    if team == 'player1':
+        board.player1score-=1
+    else:
+        board.player2score-=1
+    selected.piece.numberofmoves+=1
+    selected.piece.pos = selected2.piece.pos
+    if (selected.piecetype == 'pawn' and (selected2.piece.row == 7 or selected2.piece.row == 0)):
+        if team == 'player1':
+            selected2.ClearSquare()
+            selected2.SetPiece(win,Queen('player1',selected2.piece.pos))
+            selected2.piece.numberofmoves = selected.piece.numberofmoves
+            selected.ClearSquare()
+        else:
+            selected2.ClearSquare()
+            selected2.SetPiece(win,Queen('player2',selected2.piece.pos))
+            selected2.piece.numberofmoves = selected.piece.numberofmoves
+            selected.ClearSquare()
+    else:
+        selected2.piece.pos = [-1,-1]
+        selected2.ClearSquare()
+        selected2.SetPiece(win,selected.piece)
+        selected.ClearSquare()
+
 def UpdateScore(board,p1scorenumber,p2scorenumber):
     p1score = board.player1score
     p1scorenumber.setText(str(p1score))
     p2score = board.player2score
     p2scorenumber.setText(str(p2score))
 
-def SimulateforCheck(squares,availableprecheck,player,pos):
+def SimulateforCheck(squares,availableprecheck,player,pos,type):
     passed = []
     col = pos[0]
     row = pos[1]
-    for l in range(len(availableprecheck)):
-        dummysquares = copy.deepcopy(squares)
-        dummyselected = dummysquares[col][row]
-        dummyselected2 = dummysquares[availableprecheck[l][0]][availableprecheck[l][1]]
-        if dummyselected2.occupied and dummyselected2.team != player:
-            SimOvertake(dummyselected,dummyselected2)
-        else:
-            SimMove(dummyselected,dummyselected2,availableprecheck[l][0],availableprecheck[l][1])
-        if player == 'player1':
-            if dummyselected.piecetype == 'king':
-                if dummyselected2.piece.InCheck(dummysquares) is False:
-                    passed.append(availableprecheck[l])
+    if type == 'd':
+        for l in range(len(availableprecheck)):
+            dummysquares = copy.deepcopy(squares)
+            dummyselected = dummysquares[col][row]
+            dummyselected2 = dummysquares[availableprecheck[l][0]][availableprecheck[l][1]]
+            if dummyselected2.occupied and dummyselected2.team != player:
+                SimOvertake(dummyselected,dummyselected2)
             else:
-                if kp1.InCheck(dummysquares) is False:
-                    passed.append(availableprecheck[l])
-        else:
-            if dummyselected.piecetype == 'king':
-                if dummyselected2.piece.InCheck(dummysquares) is False:
-                    passed.append(availableprecheck[l])
+                SimMove(dummyselected,dummyselected2,availableprecheck[l][0],availableprecheck[l][1])
+            if player == 'player1':
+                if dummyselected.piecetype == 'king':
+                    if dummyselected2.piece.InCheck(dummysquares) is False:
+                        passed.append(availableprecheck[l])
+                else:
+                    if kp1.InCheck(dummysquares) is False:
+                        passed.append(availableprecheck[l])
             else:
-                if kp2.InCheck(dummysquares) is False:
-                    passed.append(availableprecheck[l])
-    return passed
-
+                if dummyselected.piecetype == 'king':
+                    if dummyselected2.piece.InCheck(dummysquares) is False:
+                        passed.append(availableprecheck[l])
+                else:
+                    if kp2.InCheck(dummysquares) is False:
+                        passed.append(availableprecheck[l])
+        return passed
+    elif type == 'a':
+        for l in range(len(availableprecheck)):
+            dummysquares = copy.deepcopy(squares)
+            dummyselected = dummysquares[col][row]
+            dummyselected2 = dummysquares[availableprecheck[l][0]][availableprecheck[l][1]]
+            if dummyselected2.occupied and dummyselected2.team != player:
+                SimOvertake(dummyselected,dummyselected2)
+            else:
+                SimMove(dummyselected,dummyselected2,availableprecheck[l][0],availableprecheck[l][1])
+            if player == 'player1':
+                    if kp2.InCheck(dummysquares):
+                        passed.append(availableprecheck[l])
+            else:
+                    if kp1.InCheck(dummysquares):
+                        passed.append(availableprecheck[l])
+        return passed               
 def checkForCheckmate(squares,player):
     # is there any move I can make that gets me out of check?, if no return True
     for n in range(0,8):
         for m in range(0,8):
             if squares[n][m].team == player:
                 moves = squares[n][m].piece.GetMoves(squares,player)
-                remaining = SimulateforCheck(squares,moves,player,squares[n][m].piece.pos)
+                remaining = SimulateforCheck(squares,moves,player,squares[n][m].piece.pos,'d')
                 if len(remaining)>0:
                     return False
     return True
@@ -849,7 +932,7 @@ def gameOver(win,windowsize,color):
     resettext.draw(win)
     endbox.draw(win)
     endtext.draw(win)
-    while 1:
+    while True:
         click = win.getMouse()
         xcoord = int(click.x)
         ycoord = int(click.y)
@@ -866,6 +949,56 @@ def gameOver(win,windowsize,color):
             endtext.undraw()
             return 'gameover'
 
+def GetCPUMove(squares):
+    # Simple CPU AI:
+    # Get all available moves for the cpu
+    bestovertake = []
+    available = []
+    highestvalue = 0
+    rank = {'queen':5,'rook':4,'bishop':3,'knight':2,'pawn':1}
+    for k in range(8):
+        for j in range(8):
+            selected = squares[k][j]
+            if selected.occupied is False:
+                continue
+            elif selected.piece.team != 'player2':
+                continue
+            availableprecheck = selected.piece.GetMoves(squares,selected.team)
+            available = SimulateforCheck(squares,availableprecheck,selected.team,selected.piece.pos,'d')
+            # Prioritize putting enemy in check
+            bestmoves = SimulateforCheck(squares,available,selected.team,selected.piece.pos,'a')
+            if len(bestmoves) > 0:
+                return (selected,squares[bestmoves[0][0]][bestmoves[0][1]]) # return first checking move available
+            # Next prioritize taking enemy piece in order of piece value
+            for i in range(len(available)):
+                option = squares[available[i][0]][available[i][1]]
+                if option.occupied:
+                    if rank[option.piecetype] > highestvalue:
+                        bestovertake = [available[i][0],available[i][1]]
+                        bestfrom = selected
+    if len(bestovertake) > 0:
+        return (bestfrom, squares[bestovertake[0]][bestovertake[1]])
+    # Else, make random move
+    while True:
+        k = random.randint(0,8)
+        j = random.randint(0,8)
+        selected = squares[k][j]
+        if selected.occupied is False:
+            continue
+        elif selected.piece.team != 'player2':
+            continue
+        availableprecheck = selected.piece.GetMoves(squares,selected.team)
+        available = SimulateforCheck(squares,availableprecheck,selected.team,selected.piece.pos,'d')
+        if len(available) == 0:
+            continue
+        elif len(available) == 1:
+            return (selected,squares[available[0][0]][available[0][1]])
+        else:
+            n = random.randint(0,len(available)-1)
+            return (selected,squares[available[n][0]][available[n][1]])
+
+
+
 # Begin Main Setup
 
 boardsize = 750
@@ -873,13 +1006,10 @@ windowsize = boardsize
 squaresize = boardsize/10
 team1color = 'seashell'
 team2color = 'royalblue'
-
 board = Board()
 win = CreateWindow(windowsize,team1color)
 text = Text(windowsize)
-
 mode = StartMenu(win,windowsize)
-
 p1scoreboard = graphics.Text(graphics.Point(130,60),'Player 1 Pieces')
 p1scoreboard.draw(win)
 p2scoreboard = graphics.Text(graphics.Point(600,60),'Player 2 Pieces')
@@ -893,15 +1023,15 @@ p2scorenumber.draw(win)
 
 [squares,kp1,kp2] = initializeGame(win,board,squaresize,team1color,team2color)
 
-
 # Begin Main Loop
 turn = 'player1'
 text.Player1turn(win)
-while 1:
+if mode == 'quit':
+    turn = 'gameover'
+while True:
     moveshapes = []
     available = []
     while turn == 'player1':
-        counter = 0
         UpdateScore(board,p1scorenumber,p2scorenumber)
         click = win.getMouse()
         drawMoveToggle(board,click.x,click.y)
@@ -934,13 +1064,13 @@ while 1:
             selected = squares[col][row]
             EraseMoveshapes(moveshapes)
             availableprecheck = selected.piece.GetMoves(squares,selected.team)
-            available = SimulateforCheck(squares,availableprecheck,selected.team,selected.piece.pos)
+            available = SimulateforCheck(squares,availableprecheck,selected.team,selected.piece.pos,'d')
             moveshapes = DrawAvailableMoves(available,squares,squaresize,win,board,selected)
         else:
             available = []
             moveshapes = []
 
-    while turn == 'player2':
+    while turn == 'player2' and mode == '2player':
         UpdateScore(board,p1scorenumber,p2scorenumber)
         click = win.getMouse()
         drawMoveToggle(board,click.x,click.y)
@@ -973,11 +1103,40 @@ while 1:
             selected = squares[col][row]
             EraseMoveshapes(moveshapes)
             availableprecheck = selected.piece.GetMoves(squares,selected.team)
-            available = SimulateforCheck(squares,availableprecheck,selected.team,selected.piece.pos)
+            available = SimulateforCheck(squares,availableprecheck,selected.team,selected.piece.pos,'d')
             moveshapes = DrawAvailableMoves(available,squares,squaresize,win,board,selected)
         else:
             available = []
             moveshapes = []
+
+
+    while turn == 'player2' and mode == 'cpu':
+        UpdateScore(board,p1scorenumber,p2scorenumber)
+        time.sleep(2)
+        bestmoves = []
+        bettermoves = []
+        available = []
+        (movefrom, moveto) = GetCPUMove(squares)
+        selected = movefrom
+        selected2 = moveto
+        if selected2.team == 'player1':
+            cpuOvertake(selected,selected2,board,selected2.team)
+        else:
+            cpuMove(selected,selected2)
+        turn = 'player1'
+        if kp2.InCheck(squares) is False:
+            text.block2.undraw()
+        if kp1.InCheck(squares):
+            if checkForCheckmate(squares,turn):
+                text.Checkmate(win,team1color)
+                text.Player2win(win,team1color)
+                win.setBackground(team2color)
+                turn = gameOver(win,windowsize,'orange')
+                break
+            else:
+                text.Check(win)
+        text.Player1turn(win)
+        break
     if turn == 'gameover':
         win.close()
         break
