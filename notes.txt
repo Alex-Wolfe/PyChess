@@ -1,5 +1,5 @@
 Gamerules to do:
-add en passant behavior
+complete
 
 
 Extras to do:
@@ -11,7 +11,7 @@ Simple CPU AI explanation
 a simple AI would prioritize the following moves
      1.) Putting enemy in check
      2.) Taking enemy piece (ranked by piece value in order of queen, rook, bishop, knight, pawn
-     3.) Castling
+     3.) Castling if possible
      4.) Else, make random move
      5.) Look one move ahead to maximize expected score
 Note: if a pawn is the most valuable piece the cpu can take, make random move

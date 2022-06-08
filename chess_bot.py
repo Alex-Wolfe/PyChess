@@ -17,6 +17,7 @@ class Board():
         self.totalalive = self.player1score + self.player2score
         self.drawmoves = True
 
+
 class Text():
     def __init__(self,windowsize):
         self.block = graphics.Text(graphics.Point(windowsize/2,12*windowsize/13),'')
@@ -71,6 +72,7 @@ class Text():
         self.block2.setTextColor('black')
         self.block2.setSize(20)
         self.block2.draw(win)
+
 
 class Square():
     def __init__(self):
@@ -194,6 +196,14 @@ class Pawn():
             if self.row > 0 and self.col < 7:
                 if squares[self.col+1][self.row-1].team != player and squares[self.col+1][self.row-1].team != 'none':
                     available.append([self.col+1, self.row-1])
+            if self.col < 7 and self.row == 3:
+                if squares[self.col+1][self.row].occupied and squares[self.col+1][self.row].team != player:
+                    if squares[self.col+1][self.row].piece.numberofmoves == 1:
+                        available.append([self.col+1,self.row-1])
+            if self.col > 0 and self.row == 3:
+                if squares[self.col-1][self.row].occupied and squares[self.col-1][self.row].team != player:
+                    if squares[self.col-1][self.row].piece.numberofmoves == 1:
+                        available.append([self.col-1,self.row-1])
         else:
             if self.numberofmoves == 0:
                 if self.row < 6:
@@ -208,6 +218,14 @@ class Pawn():
             if self.row < 7 and self.col > 0:
                 if squares[self.col-1][self.row+1].team != player and squares[self.col-1][self.row+1].team != 'none':
                     available.append([self.col-1, self.row+1])
+            if self.col < 7 and self.row == 4:
+                if self.row == 4 and squares[self.col+1][self.row].occupied and squares[self.col+1][self.row].team != player:
+                    if squares[self.col+1][self.row].piece.numberofmoves == 1:
+                        available.append([self.col+1,self.row+1])
+            if self.col > 0 and self.row == 4:
+                if squares[self.col-1][self.row].occupied and squares[self.col-1][self.row].team != player:
+                    if squares[self.col-1][self.row].piece.numberofmoves == 1:
+                        available.append([self.col-1,self.row+1])
         return available
 
 
@@ -263,6 +281,7 @@ class King():
             return True
         else:
             return False
+
 
 class Queen():
     def __init__(self,team,pos):
@@ -454,6 +473,7 @@ class Bishop():
             else:
                 break
         return available
+
 
 class Rook():
     def __init__(self,team,pos):
@@ -661,6 +681,12 @@ def DrawAvailableMoves(available,squares,squaresize,win,board,selected):
             elif squares[available[k][0]][available[k][1]].occupied:
                 moveshapes.append(graphics.Circle(squares[available[k][0]][available[k][1]].center,squaresize/7))
                 moveshapes[k].setFill('green')
+                moveshapes[k].setWidth(3)
+                moveshapes[k].draw(win)
+            elif selected.piecetype == 'pawn' and available[k][0] != selected.pos[0]:
+                moveshapes.append(graphics.Rectangle(squares[available[k][0]][available[k][1]].p1,squares[available[k][0]][available[k][1]].p2))
+                moveshapes[k].setOutline('red')
+                moveshapes[k].setWidth(3)
                 moveshapes[k].draw(win)
             else:
                 moveshapes.append(graphics.Circle(squares[available[k][0]][available[k][1]].center,squaresize/7))
@@ -690,14 +716,14 @@ def GetClickCoords(click):
 # Castles the king and selected rook
 def Castle(squares,selected,selected2):
     if selected2.pos[0] > selected.pos[0]:
-        Move(selected,squares[selected.pos[0]+2][selected.pos[1]])
-        Move(selected2,squares[selected.pos[0]+1][selected.pos[1]])
+        Move(squares,selected,squares[selected.pos[0]+2][selected.pos[1]],board)
+        Move(squares,selected2,squares[selected.pos[0]+1][selected.pos[1]],board)
     else:
-        Move(selected,squares[selected.pos[0]-2][selected.pos[1]])
-        Move(selected2,squares[selected.pos[0]-1][selected.pos[1]])
+        Move(squares,selected,squares[selected.pos[0]-2][selected.pos[1]],board)
+        Move(squares,selected2,squares[selected.pos[0]-1][selected.pos[1]],board)
 
-# Moves a piece to an empty square, and checks for promotion of pawn case
-def Move(selected,selected2):
+# Moves a piece to an empty square, and checks for promotion of pawn and checks for en passant
+def Move(squares,selected,selected2,board):
     team = selected.team
     selected.piece.pos = selected2.pos
     selected.piece.numberofmoves+=1
@@ -750,6 +776,15 @@ def Move(selected,selected2):
                         selected2.piece.numberofmoves = selected.piece.numberofmoves
                         selected.ClearSquare()
                         break
+    elif selected.piecetype == 'pawn' and selected2.pos[0] != selected.pos[0]:
+        selected2.SetPiece(win,selected.piece)
+        selected.ClearSquare()
+        if team == 'player1':
+            board.player2score-=1
+            squares[selected2.pos[0]][selected2.pos[1]+1].ClearSquare()
+        else:
+            board.player1score-=1
+            squares[selected2.pos[0]][selected2.pos[1]-1].ClearSquare()
     else:
         selected2.SetPiece(win,selected.piece)
         selected.ClearSquare()
@@ -1126,25 +1161,25 @@ while True:
             if selected2.team == 'player2':
                 Overtake(selected,selected2,board,selected2.team)
             elif selected2.occupied is False:
-                Move(selected,selected2)
+                Move(squares,selected,selected2,board)
             else:
                 Castle(squares,selected,selected2)
             turn = 'player2'
             if kp1.InCheck(squares) is False:
                 text.block2.undraw()
-            if kp2.InCheck(squares):
-                if CheckforMate(squares,turn):
-                    text.Checkmate(win,team1color)
-                    text.Player1win(win,team1color)
-                    win.setBackground(team2color)
-                    p1gamescore+=1
-                    gamescore.setText((str(p1gamescore),'-',str(p2gamescore)))
-                    turn = gameOver(win,windowsize,'orange')
-                    break
-                else:
-                    text.Check(win)
-            text.Player2turn(win)
-            break
+            if kp2.InCheck(squares) is False:
+                text.Player2turn(win)
+                break  
+            if CheckforMate(squares,turn):
+                text.Checkmate(win,team1color)
+                text.Player1win(win,team1color)
+                win.setBackground(team2color)
+                p1gamescore+=1
+                gamescore.setText((str(p1gamescore),'-',str(p2gamescore)))
+                turn = gameOver(win,windowsize,'orange')
+                break
+            text.Check(win)
+            
         elif squares[col][row].team == turn:
             selected = squares[col][row]
             EraseMoveshapes(moveshapes)
@@ -1176,25 +1211,24 @@ while True:
             if selected2.team == 'player1':
                 Overtake(selected,selected2,board,selected2.team)
             elif selected2.occupied is False:
-                Move(selected,selected2)
+                Move(squares,selected,selected2,board)
             else:
                 Castle(squares,selected,selected2)
             turn = 'player1'
             if kp2.InCheck(squares) is False:
                 text.block2.undraw()
-            if kp1.InCheck(squares):
-                if CheckforMate(squares,turn):
-                    text.Checkmate(win,team1color)
-                    text.Player2win(win,team1color)
-                    win.setBackground(team2color)
-                    p2gamescore+=1
-                    gamescore.setText((str(p1gamescore),'-',str(p2gamescore)))
-                    turn = gameOver(win,windowsize,'orange')
-                    break
-                else:
-                    text.Check(win)
-            text.Player1turn(win)
-            break
+            if kp1.InCheck(squares) is False:
+                text.Player1turn(win)
+                break
+            if CheckforMate(squares,turn):
+                text.Checkmate(win,team1color)
+                text.Player2win(win,team1color)
+                win.setBackground(team2color)
+                p2gamescore+=1
+                gamescore.setText((str(p1gamescore),'-',str(p2gamescore)))
+                turn = gameOver(win,windowsize,'orange')
+                break
+            text.Check(win)
         elif squares[col][row].team == turn:
             selected = squares[col][row]
             EraseMoveshapes(moveshapes)
@@ -1228,19 +1262,18 @@ while True:
         turn = 'player1'
         if kp2.InCheck(squares) is False:
             text.block2.undraw()
-        if kp1.InCheck(squares):
-            if CheckforMate(squares,turn):
-                text.Checkmate(win,team1color)
-                text.Player2win(win,team1color)
-                win.setBackground(team2color)
-                p2gamescore+=1
-                gamescore.setText((str(p1gamescore),'-',str(p2gamescore)))
-                turn = gameOver(win,windowsize,'orange')
-                break
-            else:
-                text.Check(win)
-        text.Player1turn(win)
-        break
+        if kp1.InCheck(squares) is False:
+            text.Player1turn(win)
+            break
+        if CheckforMate(squares,turn):
+            text.Checkmate(win,team1color)
+            text.Player2win(win,team1color)
+            win.setBackground(team2color)
+            p2gamescore+=1
+            gamescore.setText((str(p1gamescore),'-',str(p2gamescore)))
+            turn = gameOver(win,windowsize,'orange')
+            break
+        text.Check(win)
     if turn == 'gameover':
         win.close()
         break
