@@ -2,7 +2,7 @@
 # Authored by Alex Wolfe on 5/29/2022
 
 
-from os import fsdecode
+
 import graphics
 import copy
 import random
@@ -22,6 +22,7 @@ class Text():
         self.block = graphics.Text(graphics.Point(windowsize/2,12*windowsize/13),'')
         self.block2 = graphics.Text(graphics.Point(windowsize/2,windowsize/15),'')
 
+    # Define different text events that display on the screen throughout the game
     def Player1turn(self,win):
         self.block.undraw()
         self.block.setText('Player 1 Turn')
@@ -90,6 +91,7 @@ class Square():
     def SetColor(self,color):
         self.color = color
 
+    # Places a selected piece on a selected square
     def SetPiece(self,win,piece):
         self.occupied = True
         self.piece = piece
@@ -139,13 +141,13 @@ class Square():
                     image = graphics.Image(self.center,'bishop_black.png')
                     graphics.Image.draw(image,win)
 
+    # Same as SetPiece, but without updating the piece images
     def SimSetPiece(self,piece):
         self.occupied = True
         self.piece = piece
         self.piecetype = piece.type
         self.team = piece.team
     
-
     def ClearSquare(self):
         self.occupied = False
         self.team = 'none'
@@ -173,6 +175,7 @@ class Pawn():
         self.row = pos[1]
         self.numberofmoves = 0
 
+    # Gets all available moves that a piece can make. Not counting check limitations
     def GetMoves(self,squares,player):
         available = []
         self.col = self.pos[0]
@@ -247,6 +250,7 @@ class King():
                 available.append([self.col+1, self.row+1])
         return available
 
+    # Bool function used to determine if king is in check
     def InCheck(self,squares):
         contested = []
         for k in range(0,8):
@@ -505,10 +509,8 @@ def initializeGame(win,board,squaresize,team1color,team2color):
     board.player1score = 16
     board.player2score = 16
     drawPromoters(win,squaresize)
-    # Create Array of Squares
+    # Create Array of Squares that make up game board
     squares = [[Square() for i in range(9)] for i in range(9)]
-    
-    # Iterate through square and set colors
     for k in range(0,8):
         for j in range(0,8):
             squares[k][j].pos = [k,j]
@@ -519,7 +521,7 @@ def initializeGame(win,board,squaresize,team1color,team2color):
             p1 = graphics.Point(k*squaresize+squaresize,j*squaresize+squaresize)
             p2 = graphics.Point(p1.x+squaresize,p1.y+squaresize)
             squares[k][j].Draw(win,p1,p2,'black')
-    # Assign Pieces to squares  
+    # Assign Pieces to squares in starting configuration
     for k in range(0,8):
         squares[k][6].SetPiece(win,Pawn('player1',[k,6]))
         squares[k][1].SetPiece(win,Pawn('player2',[k,1]))  
@@ -544,6 +546,7 @@ def initializeGame(win,board,squaresize,team1color,team2color):
     drawMoveButton(win)
     return [squares,kp1,kp2]
 
+# Draws clickable piece images for promotion of pawns
 def drawPromoters(win,squaresize):
     promoters = ['knight_black.png','bishop_black.png','rook_black.png','queen_black.png','knight_white.png','bishop_white.png','rook_white.png','queen_white.png']
     for i in range(4):
@@ -559,11 +562,13 @@ def drawPromoters(win,squaresize):
         image = graphics.Image(center,promoters[k])
         graphics.Image.draw(image,win)
 
+# Creates main game window
 def CreateWindow(size,color):
     win = graphics.GraphWin('PyChess',size,size)
     win.setBackground(color) 
     return win  
 
+# Handles start menu and choosing of game mode
 def StartMenu(win,windowsize):
     header = graphics.Text(graphics.Point(windowsize/2,windowsize/4),'PyChess')
     header.setSize(30)
@@ -627,6 +632,7 @@ def StartMenu(win,windowsize):
             text3.undraw()
             return 'quit'
 
+# Draws button that controls whether or not available moves are drawn
 def drawMoveButton(win):
     box = graphics.Rectangle(graphics.Point(windowsize/2-60,720+10),graphics.Point(windowsize/2+60,720-10))
     q = graphics.Text(graphics.Point((box.p1.x+box.p2.x)/2,(box.p1.y+box.p2.y)/2),'Toggle Draw Moves')
@@ -634,6 +640,7 @@ def drawMoveButton(win):
     box.draw(win)
     q.draw(win)
 
+# Takes in click coords, and checks whether or not draw move toggle button was clicked
 def drawMoveToggle(board,x,y):
     if x > windowsize/2-60 and x < windowsize/2+60 and y > 720-10 and y < 720+10:
         if board.drawmoves:
@@ -641,6 +648,7 @@ def drawMoveToggle(board,x,y):
         else:
             board.drawmoves = True
 
+# Takes in available moves for a piece, and displays them on the board
 def DrawAvailableMoves(available,squares,squaresize,win,board,selected):
     moveshapes = []
     if board.drawmoves:
@@ -662,10 +670,12 @@ def DrawAvailableMoves(available,squares,squaresize,win,board,selected):
             moveshapes[k].draw(win)
     return moveshapes
 
+# Erases display of available moves
 def EraseMoveshapes(moveshapes):
     for k in range(len(moveshapes)):
         moveshapes[k].undraw()
 
+# Takes in click x and y pos, and outputs col and row that was clicked on
 def GetClickCoords(click):
     normx = click.x/squaresize
     normy = click.y/squaresize
@@ -673,6 +683,7 @@ def GetClickCoords(click):
     row = int((normy-1) // 1)
     return [col,row]
 
+# Moves a piece to an empty square, and checks for promotion of pawn case
 def Move(selected,selected2):
     team = selected.team
     selected.piece.pos = selected2.pos
@@ -730,11 +741,13 @@ def Move(selected,selected2):
         selected2.SetPiece(win,selected.piece)
         selected.ClearSquare()
 
+# Simplified move function used in SimulateforCheck function
 def SimMove(selected,selected2):
     selected.piece.pos = selected2.pos
     selected2.SimSetPiece(selected.piece)
     selected.SimClearSquare()
 
+# Used by cpu to move a piece. CPU can only promote pawns to queens
 def cpuMove(selected,selected2):
     team = selected.team
     selected.piece.pos = selected2.pos
@@ -754,6 +767,7 @@ def cpuMove(selected,selected2):
         selected2.SetPiece(win,selected.piece)
         selected.ClearSquare()
 
+# Moves a piece to a occupied square, capturing the enemy piece. Checks for promotion of pawn
 def Overtake(selected,selected2,board,team):
     if team == 'player1':
         board.player1score-=1
@@ -824,6 +838,7 @@ def Overtake(selected,selected2,board,team):
         selected2.SetPiece(win,selected.piece)
         selected.ClearSquare()
 
+# Simplified overtake function used in SimulateforCheck function
 def SimOvertake(selected,selected2):
     selected.piece.pos = selected2.piece.pos
     selected2.piece.pos = [-1,-1]
@@ -831,6 +846,7 @@ def SimOvertake(selected,selected2):
     selected2.SimSetPiece(selected.piece)
     selected.SimClearSquare()
 
+# Used by cpu to overtake enemy piece
 def cpuOvertake(selected,selected2,board,team):
     if team == 'player1':
         board.player1score-=1
@@ -855,12 +871,18 @@ def cpuOvertake(selected,selected2,board,team):
         selected2.SetPiece(win,selected.piece)
         selected.ClearSquare()
 
+# Updates player piece score in top right and left of screen
 def UpdateScore(board,p1scorenumber,p2scorenumber):
     p1score = board.player1score
     p1scorenumber.setText(str(p1score))
     p2score = board.player2score
     p2scorenumber.setText(str(p2score))
 
+# Filters a set of available moves for a selected piece, removing moves 
+#   that would cause the player to put themself in check
+# Can be toggled between filtering for moves that do not put the player in check, and
+#   filtering for moves that do put the enemy in check
+# Done by simulating the move on a copied (dummy) board, and running the inCheck function
 def SimulateforCheck(squares,availableprecheck,player,pos,type):
     passed = []
     col = pos[0]
@@ -904,9 +926,10 @@ def SimulateforCheck(squares,availableprecheck,player,pos,type):
             else:
                     if kp1.InCheck(dummysquares):
                         passed.append(availableprecheck[l])
-        return passed               
+        return passed     
+
+# Bool function that checks if player is in checkmate    
 def checkForCheckmate(squares,player):
-    # is there any move I can make that gets me out of check?, if no return True
     for n in range(0,8):
         for m in range(0,8):
             if squares[n][m].team == player:
@@ -916,6 +939,7 @@ def checkForCheckmate(squares,player):
                     return False
     return True
 
+# Handles game end, and prompts player to start new game or quit
 def gameOver(win,windowsize,color):
     resetbox = graphics.Rectangle(graphics.Point(windowsize/2-100,windowsize/3-50),graphics.Point(windowsize/2+100,windowsize/3+50))
     resettext = graphics.Text(graphics.Point((resetbox.p1.x+resetbox.p2.x)/2,(resetbox.p1.y+resetbox.p2.y)/2),'Rematch')
@@ -950,8 +974,8 @@ def gameOver(win,windowsize,color):
             endtext.undraw()
             return 'gameover'
 
+# Algorithm for choosing best move for cpu to make
 def GetCPUMove(squares):
-    # Simple CPU AI:
     # Get all available moves for the cpu
     bestovertake = []
     available = []
@@ -1002,7 +1026,6 @@ def GetCPUMove(squares):
 
 
 # Begin Main Setup
-
 boardsize = 750
 windowsize = boardsize
 squaresize = boardsize/10
@@ -1027,6 +1050,8 @@ p2gamescore = 0
 gamescore = graphics.Text(graphics.Point(660, 20),(str(p1gamescore),'-',str(p2gamescore)))
 gamescore.draw(win)
 [squares,kp1,kp2] = initializeGame(win,board,squaresize,team1color,team2color)
+
+
 
 # Begin Main Loop
 turn = 'player1'
@@ -1117,7 +1142,6 @@ while True:
         else:
             available = []
             moveshapes = []
-
 
     while turn == 'player2' and mode == 'cpu':
         UpdateScore(board,p1scorenumber,p2scorenumber)

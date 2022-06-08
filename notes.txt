@@ -5,7 +5,7 @@ add en passant behavior
 
 Extras to do:
 add 1 move look ahead to cpu to further improve performance
-Add game counter for players that choose to play again
+
 
 
 Simple CPU AI explanation
