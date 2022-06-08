@@ -688,7 +688,7 @@ def Move(selected,selected2):
     team = selected.team
     selected.piece.pos = selected2.pos
     selected.piece.numberofmoves+=1
-    if (selected.piecetype == 'pawn' and (selected.piece.pos[0] == 7 or selected.piece.pos[1] == 0)):
+    if (selected.piecetype == 'pawn' and (selected.piece.pos[1] == 7 or selected.piece.pos[1] == 0)):
         text.Promotion(win)
         while True:
             click = win.getMouse()
@@ -752,7 +752,7 @@ def cpuMove(selected,selected2):
     team = selected.team
     selected.piece.pos = selected2.pos
     selected.piece.numberofmoves+=1
-    if (selected.piecetype == 'pawn' and (selected.piece.pos[0] == 7 or selected.piece.pos[1] == 0)):
+    if (selected.piecetype == 'pawn' and (selected.piece.pos[1] == 7 or selected.piece.pos[1] == 0)):
         if team == 'player1':
             selected2.ClearSquare()
             selected2.SetPiece(win,Queen('player1',selected2.pos))
@@ -928,8 +928,8 @@ def SimulateforCheck(squares,availableprecheck,player,pos,type):
                         passed.append(availableprecheck[l])
         return passed     
 
-# Bool function that checks if player is in checkmate    
-def checkForCheckmate(squares,player):
+# Bool function that checks if player is in checkmate or stalemate
+def CheckforMate(squares,player):
     for n in range(0,8):
         for m in range(0,8):
             if squares[n][m].team == player:
@@ -1063,6 +1063,11 @@ while True:
     available = []
     while turn == 'player1':
         UpdateScore(board,p1scorenumber,p2scorenumber)
+        if CheckforMate(squares,turn):
+            text.Stalemate(win,team1color)
+            win.setBackground(team2color)
+            turn = gameOver(win,windowsize,'orange')
+            break
         click = win.getMouse()
         drawMoveToggle(board,click.x,click.y)
         [col,row] = GetClickCoords(click)
@@ -1074,13 +1079,13 @@ while True:
             selected2 = squares[col][row]
             if selected2.team == 'player2':
                 Overtake(selected,selected2,board,selected2.team)
-            else:
+            elif selected2.occupied is False:
                 Move(selected,selected2)
             turn = 'player2'
             if kp1.InCheck(squares) is False:
                 text.block2.undraw()
             if kp2.InCheck(squares):
-                if checkForCheckmate(squares,turn):
+                if CheckforMate(squares,turn):
                     text.Checkmate(win,team1color)
                     text.Player1win(win,team1color)
                     win.setBackground(team2color)
@@ -1104,6 +1109,11 @@ while True:
 
     while turn == 'player2' and mode == '2player':
         UpdateScore(board,p1scorenumber,p2scorenumber)
+        if CheckforMate(squares,turn):
+            text.Stalemate(win,team1color)
+            win.setBackground(team2color)
+            turn = gameOver(win,windowsize,'orange')
+            break
         click = win.getMouse()
         drawMoveToggle(board,click.x,click.y)
         [col,row] = GetClickCoords(click)
@@ -1115,13 +1125,13 @@ while True:
             selected2 = squares[col][row]
             if selected2.team == 'player1':
                 Overtake(selected,selected2,board,selected2.team)
-            else:
+            elif selected2.occupied is False:
                 Move(selected,selected2)
             turn = 'player1'
             if kp2.InCheck(squares) is False:
                 text.block2.undraw()
             if kp1.InCheck(squares):
-                if checkForCheckmate(squares,turn):
+                if CheckforMate(squares,turn):
                     text.Checkmate(win,team1color)
                     text.Player2win(win,team1color)
                     win.setBackground(team2color)
@@ -1146,6 +1156,11 @@ while True:
     while turn == 'player2' and mode == 'cpu':
         UpdateScore(board,p1scorenumber,p2scorenumber)
         time.sleep(2)
+        if CheckforMate(squares,turn):
+            text.Stalemate(win,team1color)
+            win.setBackground(team2color)
+            turn = gameOver(win,windowsize,'orange')
+            break
         bestmoves = []
         bettermoves = []
         available = []
@@ -1154,13 +1169,13 @@ while True:
         selected2 = moveto
         if selected2.team == 'player1':
             cpuOvertake(selected,selected2,board,selected2.team)
-        else:
+        elif selected2.occupied is False:
             cpuMove(selected,selected2)
         turn = 'player1'
         if kp2.InCheck(squares) is False:
             text.block2.undraw()
         if kp1.InCheck(squares):
-            if checkForCheckmate(squares,turn):
+            if CheckforMate(squares,turn):
                 text.Checkmate(win,team1color)
                 text.Player2win(win,team1color)
                 win.setBackground(team2color)
