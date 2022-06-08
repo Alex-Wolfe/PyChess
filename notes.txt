@@ -4,7 +4,7 @@ complete
 
 Extras to do:
 add 1 move look ahead to cpu to further improve performance
-
+flip board so that each players takes their turn from the same perspective
 
 
 Simple CPU AI explanation
