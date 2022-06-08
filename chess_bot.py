@@ -227,7 +227,7 @@ class Pawn():
         else:
             if self.numberofmoves == 0:
                 if self.row < 6:
-                    if squares[self.col][self.row+2].occupied is False:
+                    if squares[self.col][self.row+1].occupied is False and squares[self.col][self.row+2].occupied is False:
                         available.append([self.col, self.row+2])
             if self.row < 7:
                 if squares[self.col][self.row+1].occupied is False:
@@ -584,6 +584,7 @@ def initializeGame(win,board,squaresize,team1color,team2color):
     squares[4][7].SetPiece(win,kp1)
     squares[4][0].SetPiece(win,kp2)
     drawMoveButton(win)
+    drawexitButton(win)
     return [squares,kp1,kp2]
 
 # Draws clickable piece images for promotion of pawns
@@ -610,6 +611,9 @@ def CreateWindow(size,color):
 
 # Handles start menu and choosing of game mode
 def StartMenu(win,windowsize):
+    background = graphics.Rectangle(graphics.Point(0,0),graphics.Point(windowsize,windowsize))
+    background.setOutline(team1color)
+    background.setFill(team1color)
     header = graphics.Text(graphics.Point(windowsize/2,windowsize/4),'PyChess')
     header.setSize(30)
     header.setTextColor(team2color)
@@ -624,6 +628,7 @@ def StartMenu(win,windowsize):
     text2 = graphics.Text(graphics.Point(windowsize/2,windowsize/2+150),'VS Computer')
     rect3 = graphics.Rectangle(graphics.Point(windowsize/2-50,12*windowsize/13-25),graphics.Point(windowsize/2+50,12*windowsize/13+25))
     text3 = graphics.Text(graphics.Point(windowsize/2,12*windowsize/13),'Quit')
+    background.draw(win)
     header.draw(win)
     name.draw(win)
     kw.draw(win)
@@ -639,6 +644,7 @@ def StartMenu(win,windowsize):
         xcoord = int(click.x)
         ycoord = int(click.y)
         if xcoord > int(windowsize/2-100) and xcoord < int(windowsize/2+100) and ycoord > int(windowsize/2-50) and ycoord < int(windowsize/2+50):
+            background.undraw()
             header.undraw()
             kw.undraw()
             kb.undraw()
@@ -651,6 +657,7 @@ def StartMenu(win,windowsize):
             return '2player'
         elif xcoord > int(windowsize/2-100) and xcoord < int(windowsize/2+100) and ycoord > int(windowsize/2+150-50) and ycoord < int(windowsize/2+150+50):
             header.undraw()
+            background.undraw()
             kw.undraw()
             kb.undraw()
             rect1.undraw()
@@ -662,6 +669,7 @@ def StartMenu(win,windowsize):
             return 'cpu'
         elif xcoord > int(windowsize/2-50) and xcoord < int(windowsize/2+50) and ycoord > int(12*windowsize/13-25) and ycoord < int(12*windowsize/13+25):
             header.undraw()
+            background.undraw()
             kw.undraw()
             kb.undraw()
             rect1.undraw()
@@ -688,6 +696,20 @@ def drawMoveToggle(board,x,y):
         else:
             board.drawmoves = True
 
+# Draws quit to start menu button
+def drawexitButton(win):
+    box = graphics.Rectangle(graphics.Point(30,720+10),graphics.Point(130,720-10))
+    q = graphics.Text(graphics.Point((box.p1.x+box.p2.x)/2,(box.p1.y+box.p2.y)/2),'Quit to Start')
+    q.setSize(10)
+    box.draw(win)
+    q.draw(win)
+
+# Take in click coords, and checks whether or not quit to start was clicked
+def exitButton(x,y):
+    if x > 30 and x < 130 and y > 720-10 and y < 720+10:
+        return True
+    return False
+        
 # Takes in available moves for a piece, and displays them on the board
 def DrawAvailableMoves(available,squares,squaresize,win,board,selected):
     moveshapes = []
@@ -999,11 +1021,11 @@ def SimulateforCheck(squares,availableprecheck,player,pos,type):
 # Adds move at rook if castling is a legal move
 def checkCastling(squares,moves,team,pos):
     finalmoves = moves
-    if squares[pos[0]+1][pos[1]].occupied is False and squares[pos[0]+2][pos[1]].occupied is False and\
+    if squares[pos[0]+1][pos[1]].occupied is False and squares[pos[0]+3][pos[1]].occupied and squares[pos[0]+2][pos[1]].occupied is False and\
     squares[pos[0]+3][pos[1]].piece.numberofmoves == 0 and isContested(squares,[pos[0]+1,pos[1]],team) is False and\
     isContested(squares,[pos[0]+2,pos[1]],team) is False:
         finalmoves.append([pos[0]+3,pos[1]])
-    if squares[pos[0]-1][pos[1]].occupied is False and squares[pos[0]-2][pos[1]].occupied is False and\
+    if squares[pos[0]-1][pos[1]].occupied is False and squares[pos[0]-4][pos[1]].occupied and squares[pos[0]-2][pos[1]].occupied is False and\
     squares[pos[0]-3][pos[1]].occupied is False and squares[pos[0]-4][pos[1]].piece.numberofmoves == 0 and\
     isContested(squares,[pos[0]-1,pos[1]],team) is False and isContested(squares,[pos[0]-2,pos[1]],team) is False and\
     isContested(squares,[pos[0]-3,pos[1]],team) is False:
@@ -1125,10 +1147,16 @@ def GetCPUMove(squares):
             for i in range(len(available)):
                 option = squares[available[i][0]][available[i][1]]
                 if option.occupied:
-                    if rank[option.piecetype] > highestvalue:
-                        bestovertake = [available[i][0],available[i][1]]
-                        bestfrom = selected
-                        highestvalue = rank[option.piecetype]
+                    if isContested(squares,[available[i][0],available[i][1]],'player2') is False:
+                        if rank[option.piecetype] > highestvalue:
+                            bestovertake = [available[i][0],available[i][1]]
+                            bestfrom = selected
+                            highestvalue = rank[option.piecetype]
+                    else:
+                        if rank[option.piecetype] > highestvalue and rank[option.piecetype] > rank[selected.piecetype]:
+                            bestovertake = [available[i][0],available[i][1]]
+                            bestfrom = selected
+                            highestvalue = rank[option.piecetype]
     if len(bestovertake) > 0 and highestvalue > 1:
         return (bestfrom, squares[bestovertake[0]][bestovertake[1]])
     # Next prioritize castling
@@ -1202,6 +1230,17 @@ while True:
             break
         click = win.getMouse()
         drawMoveToggle(board,click.x,click.y)
+        if (exitButton(click.x,click.y)):
+            turn = 'player1'
+            text.Player1turn(win)
+            mode = StartMenu(win,windowsize)
+            gamescore.setText('0-0')
+            [squares,kp1,kp2] = initializeGame(win,board,squaresize,team1color,team2color)
+            win.setBackground(team1color)
+            text.block2.undraw()
+            if mode == 'quit':
+                turn = 'gameover'
+            break
         [col,row] = GetClickCoords(click)
         EraseMoveshapes(moveshapes)
         if [col,row] in available:
@@ -1251,6 +1290,17 @@ while True:
             break
         click = win.getMouse()
         drawMoveToggle(board,click.x,click.y)
+        if (exitButton(click.x,click.y)):
+            turn = 'player1'
+            text.Player1turn(win)
+            mode = StartMenu(win,windowsize)
+            gamescore.setText('0-0')
+            [squares,kp1,kp2] = initializeGame(win,board,squaresize,team1color,team2color)
+            win.setBackground(team1color)
+            text.block2.undraw()
+            if mode == 'quit':
+                turn = 'gameover'
+            break
         [col,row] = GetClickCoords(click)
         EraseMoveshapes(moveshapes)
         if [col,row] in available:
@@ -1293,7 +1343,7 @@ while True:
 
     while turn == 'player2' and mode == 'cpu':
         UpdateScore(board,p1scorenumber,p2scorenumber)
-        time.sleep(2)
+        time.sleep(1)
         if CheckforMate(squares,turn):
             text.Stalemate(win,team1color)
             win.setBackground(team2color)
