@@ -1,7 +1,5 @@
 Gamerules to do:
-Add castling behavior
 add en passant behavior
-check for stalemate
 
 
 Extras to do:

@@ -653,10 +653,14 @@ def DrawAvailableMoves(available,squares,squaresize,win,board,selected):
     moveshapes = []
     if board.drawmoves:
         for k in range(len(available)):
-            if squares[available[k][0]][available[k][1]].occupied:
+            if squares[available[k][0]][available[k][1]].occupied and squares[available[k][0]][available[k][1]].team != selected.team:
                 moveshapes.append(graphics.Rectangle(squares[available[k][0]][available[k][1]].p1,squares[available[k][0]][available[k][1]].p2))
                 moveshapes[k].setOutline('red')
                 moveshapes[k].setWidth(3)
+                moveshapes[k].draw(win)
+            elif squares[available[k][0]][available[k][1]].occupied:
+                moveshapes.append(graphics.Circle(squares[available[k][0]][available[k][1]].center,squaresize/7))
+                moveshapes[k].setFill('green')
                 moveshapes[k].draw(win)
             else:
                 moveshapes.append(graphics.Circle(squares[available[k][0]][available[k][1]].center,squaresize/7))
@@ -682,6 +686,15 @@ def GetClickCoords(click):
     col = int((normx-1) // 1)
     row = int((normy-1) // 1)
     return [col,row]
+
+# Castles the king and selected rook
+def Castle(squares,selected,selected2):
+    if selected2.pos[0] > selected.pos[0]:
+        Move(selected,squares[selected.pos[0]+2][selected.pos[1]])
+        Move(selected2,squares[selected.pos[0]+1][selected.pos[1]])
+    else:
+        Move(selected,squares[selected.pos[0]-2][selected.pos[1]])
+        Move(selected2,squares[selected.pos[0]-1][selected.pos[1]])
 
 # Moves a piece to an empty square, and checks for promotion of pawn case
 def Move(selected,selected2):
@@ -926,7 +939,35 @@ def SimulateforCheck(squares,availableprecheck,player,pos,type):
             else:
                     if kp1.InCheck(dummysquares):
                         passed.append(availableprecheck[l])
-        return passed     
+        return passed   
+
+# Adds move at rook if castling is a legal move
+def checkCastling(squares,moves,team,pos):
+    finalmoves = moves
+    if squares[pos[0]+1][pos[1]].occupied is False and squares[pos[0]+2][pos[1]].occupied is False and\
+    squares[pos[0]+3][pos[1]].piece.numberofmoves == 0 and isContested(squares,[pos[0]+1,pos[1]],team) is False and\
+    isContested(squares,[pos[0]+2,pos[1]],team) is False:
+        finalmoves.append([pos[0]+3,pos[1]])
+    if squares[pos[0]-1][pos[1]].occupied is False and squares[pos[0]-2][pos[1]].occupied is False and\
+    squares[pos[0]-3][pos[1]].occupied is False and squares[pos[0]-4][pos[1]].piece.numberofmoves == 0 and\
+    isContested(squares,[pos[0]-1,pos[1]],team) is False and isContested(squares,[pos[0]-2,pos[1]],team) is False and\
+    isContested(squares,[pos[0]-3,pos[1]],team) is False:
+        finalmoves.append([pos[0]-4,pos[1]])
+    return finalmoves
+
+# Bool function that checks if a square is contested by enemy  
+def isContested(squares,pos,team):
+    contested = []
+    for k in range(0,8):
+        for j in range(0,8):
+            if squares[k][j].occupied is True and squares[k][j].team != team:
+                results = squares[k][j].piece.GetMoves(squares,squares[k][j].team)
+                for i in range(len(results)):
+                    contested.append(results[i])
+    if pos in contested:
+        return True
+    else:
+        return False
 
 # Bool function that checks if player is in checkmate or stalemate
 def CheckforMate(squares,player):
@@ -1004,6 +1045,11 @@ def GetCPUMove(squares):
                         highestvalue = rank[option.piecetype]
     if len(bestovertake) > 0 and highestvalue > 1:
         return (bestfrom, squares[bestovertake[0]][bestovertake[1]])
+    # Next prioritize castling
+    if kp2.numberofmoves == 0:
+        castles = checkCastling(squares,[],'player2',kp2.pos)
+        if len(castles) > 0:
+            return (squares[kp2.pos[0]][kp2.pos[1]],squares[castles[0][0]][castles[0][1]])
     # Else, make random move
     while True:
         k = random.randint(0,8)
@@ -1081,6 +1127,8 @@ while True:
                 Overtake(selected,selected2,board,selected2.team)
             elif selected2.occupied is False:
                 Move(selected,selected2)
+            else:
+                Castle(squares,selected,selected2)
             turn = 'player2'
             if kp1.InCheck(squares) is False:
                 text.block2.undraw()
@@ -1101,6 +1149,8 @@ while True:
             selected = squares[col][row]
             EraseMoveshapes(moveshapes)
             availableprecheck = selected.piece.GetMoves(squares,selected.team)
+            if selected.piecetype == 'king' and selected.piece.numberofmoves == 0:
+                availableprecheck = checkCastling(squares,availableprecheck,selected.team,selected.pos)
             available = SimulateforCheck(squares,availableprecheck,selected.team,selected.piece.pos,'d')
             moveshapes = DrawAvailableMoves(available,squares,squaresize,win,board,selected)
         else:
@@ -1127,6 +1177,8 @@ while True:
                 Overtake(selected,selected2,board,selected2.team)
             elif selected2.occupied is False:
                 Move(selected,selected2)
+            else:
+                Castle(squares,selected,selected2)
             turn = 'player1'
             if kp2.InCheck(squares) is False:
                 text.block2.undraw()
@@ -1147,6 +1199,8 @@ while True:
             selected = squares[col][row]
             EraseMoveshapes(moveshapes)
             availableprecheck = selected.piece.GetMoves(squares,selected.team)
+            if selected.piecetype == 'king' and selected.piece.numberofmoves == 0:
+                availableprecheck = checkCastling(squares,availableprecheck,selected.team,selected.pos)
             available = SimulateforCheck(squares,availableprecheck,selected.team,selected.piece.pos,'d')
             moveshapes = DrawAvailableMoves(available,squares,squaresize,win,board,selected)
         else:
