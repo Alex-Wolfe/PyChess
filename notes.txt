@@ -14,4 +14,7 @@ a simple AI would prioritize the following moves
      3.) Castling if possible
      4.) Else, make random move
      5.) Look one move ahead to maximize expected score
-Note: if a pawn is the most valuable piece the cpu can take, make random move
+
+Extra Rules:   if a pawn is the most valuable piece the cpu can take, make random move
+               Never make a move to put the enemy in check if the position is contested by the enemy and not contested by self
+               In future, only make tradeable move if trade value is net positive judged by piece value

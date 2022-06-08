@@ -177,6 +177,26 @@ class Pawn():
         self.row = pos[1]
         self.numberofmoves = 0
 
+    def GetContestingMoves(self,squares,player):
+        available = []
+        self.col = self.pos[0]
+        self.row = self.pos[1]
+        if player == 'player1':
+            if self.row > 0 and self.col > 0:
+                if squares[self.col-1][self.row-1].team != player and squares[self.col-1][self.row-1].team != 'none':
+                    available.append([self.col-1, self.row-1])
+            if self.row > 0 and self.col < 7:
+                if squares[self.col+1][self.row-1].team != player and squares[self.col+1][self.row-1].team != 'none':
+                    available.append([self.col+1, self.row-1])
+        else:
+            if self.row < 7 and self.col < 7:
+                if squares[self.col+1][self.row+1].team != player and squares[self.col+1][self.row+1].team != 'none':
+                    available.append([self.col+1, self.row+1])
+            if self.row < 7 and self.col > 0:
+                if squares[self.col-1][self.row+1].team != player and squares[self.col-1][self.row+1].team != 'none':
+                    available.append([self.col-1, self.row+1])
+        return available
+
     # Gets all available moves that a piece can make. Not counting check limitations
     def GetMoves(self,squares,player):
         available = []
@@ -993,17 +1013,36 @@ def checkCastling(squares,moves,team,pos):
 # Bool function that checks if a square is contested by enemy  
 def isContested(squares,pos,team):
     contested = []
-    for k in range(0,8):
-        for j in range(0,8):
-            if squares[k][j].occupied is True and squares[k][j].team != team:
-                results = squares[k][j].piece.GetMoves(squares,squares[k][j].team)
-                for i in range(len(results)):
-                    contested.append(results[i])
-    if pos in contested:
-        return True
+    if squares[pos[0]][pos[1]].team != team and squares[pos[0]][pos[1]].occupied is True:
+        enemyteam = squares[pos[0]][pos[1]].team
+        piecetype = squares[pos[0]][pos[1]].piecetype
+        piecedict = {'king':King(enemyteam,pos),'queen':Queen(enemyteam,pos),'rook':Rook(enemyteam,pos),'bishop':Bishop(enemyteam,pos),'knight':Knight(enemyteam,pos),'pawn':Pawn(enemyteam,pos)}
+        squares[pos[0]][pos[1]].SimClearSquare()
+        for k in range(0,8):
+            for j in range(0,8):
+                if squares[k][j].occupied is True and squares[k][j].team != team:
+                    if squares[k][j].piecetype == 'pawn':
+                        results = squares[k][j].piece.GetContestingMoves(squares,squares[k][j].team)
+                    else:
+                        results = squares[k][j].piece.GetMoves(squares,squares[k][j].team)
+                    for i in range(len(results)):
+                        contested.append(results[i])
+        squares[pos[0]][pos[1]].SimSetPiece(piecedict[piecetype])
+        if pos in contested:
+            return True
+        else:
+            return False
     else:
-        return False
-
+        for k in range(0,8):
+            for j in range(0,8):
+                if squares[k][j].occupied is True and squares[k][j].team != team:
+                    results = squares[k][j].piece.GetMoves(squares,squares[k][j].team)
+                    for i in range(len(results)):
+                        contested.append(results[i])
+        if pos in contested:
+            return True
+        else:
+            return False
 # Bool function that checks if player is in checkmate or stalemate
 def CheckforMate(squares,player):
     for n in range(0,8):
@@ -1066,10 +1105,22 @@ def GetCPUMove(squares):
                 continue
             availableprecheck = selected.piece.GetMoves(squares,selected.team)
             available = SimulateforCheck(squares,availableprecheck,selected.team,selected.piece.pos,'d')
-            # Prioritize putting enemy in check
+            # Prioritize putting enemy in check but not while sacrificing a piece without a trade
             bestmoves = SimulateforCheck(squares,available,selected.team,selected.piece.pos,'a')
             if len(bestmoves) > 0:
-                return (selected,squares[bestmoves[0][0]][bestmoves[0][1]]) # return first checking move available
+                for n in range(len(bestmoves)):
+                    if isContested(squares,bestmoves[n],'player2') is True:
+                        piecetype = selected.piecetype
+                        pos = selected.piece.pos
+                        piecedict = {'king':King('player2',pos),'queen':Queen('player2',pos),'rook':Rook('player2',pos),'bishop':Bishop('player2',pos),'knight':Knight('player2',pos),'pawn':Pawn('player2',pos)}
+                        selected.SimClearSquare()
+                        if isContested(squares,bestmoves[n],'player1') is True:
+                            selected.SimSetPiece(piecedict[piecetype])
+                            return (selected,squares[bestmoves[n][0]][bestmoves[n][1]])
+                        else:
+                            selected.SimSetPiece(piecedict[piecetype])
+                    else:
+                        return (selected,squares[bestmoves[n][0]][bestmoves[n][1]])
             # Next prioritize taking enemy piece in order of piece value
             for i in range(len(available)):
                 option = squares[available[i][0]][available[i][1]]
@@ -1106,7 +1157,7 @@ def GetCPUMove(squares):
 
 
 
-# Begin Main Setup
+# Begin Game Setup
 boardsize = 750
 windowsize = boardsize
 squaresize = boardsize/10
@@ -1134,7 +1185,7 @@ gamescore.draw(win)
 
 
 
-# Begin Main Loop
+# Begin Game Loop
 turn = 'player1'
 text.Player1turn(win)
 if mode == 'quit':
@@ -1179,7 +1230,6 @@ while True:
                 turn = gameOver(win,windowsize,'orange')
                 break
             text.Check(win)
-            
         elif squares[col][row].team == turn:
             selected = squares[col][row]
             EraseMoveshapes(moveshapes)
