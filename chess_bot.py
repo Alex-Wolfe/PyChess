@@ -975,6 +975,7 @@ def UpdateScore(board,p1scorenumber,p2scorenumber):
 # Done by simulating the move on a copied (dummy) board, and running the inCheck function
 def SimulateforCheck(squares,availableprecheck,player,pos,type):
     passed = []
+    checkmates = []
     col = pos[0]
     row = pos[1]
     if type == 'd':
@@ -1013,10 +1014,14 @@ def SimulateforCheck(squares,availableprecheck,player,pos,type):
             if player == 'player1':
                     if kp2.InCheck(dummysquares):
                         passed.append(availableprecheck[l])
+                    if CheckforMate(dummysquares,'player2'):
+                        checkmates.append(availableprecheck[l])
             else:
                     if kp1.InCheck(dummysquares):
                         passed.append(availableprecheck[l])
-        return passed   
+                    if CheckforMate(dummysquares,'player1'):
+                        checkmates.append(availableprecheck[l])
+        return (passed,checkmates)   
 
 # Adds move at rook if castling is a legal move
 def checkCastling(squares,moves,team,pos):
@@ -1128,7 +1133,9 @@ def GetCPUMove(squares):
             availableprecheck = selected.piece.GetMoves(squares,selected.team)
             available = SimulateforCheck(squares,availableprecheck,selected.team,selected.piece.pos,'d')
             # Prioritize putting enemy in check but not while sacrificing a piece without a trade
-            bestmoves = SimulateforCheck(squares,available,selected.team,selected.piece.pos,'a')
+            (bestmoves,checkmates) = SimulateforCheck(squares,available,selected.team,selected.piece.pos,'a')
+            if len(checkmates) > 0:
+                return (selected,squares[checkmates[0][0]][checkmates[0][1]])
             if len(bestmoves) > 0:
                 for n in range(len(bestmoves)):
                     if isContested(squares,bestmoves[n],'player2') is True:
@@ -1136,7 +1143,7 @@ def GetCPUMove(squares):
                         pos = selected.piece.pos
                         piecedict = {'king':King('player2',pos),'queen':Queen('player2',pos),'rook':Rook('player2',pos),'bishop':Bishop('player2',pos),'knight':Knight('player2',pos),'pawn':Pawn('player2',pos)}
                         selected.SimClearSquare()
-                        if isContested(squares,bestmoves[n],'player1') is True:
+                        if isContested(squares,bestmoves[n],'player1') is True or rank[squares[bestmoves[n][0]][bestmoves[n][1]].piecetype] > rank[selected.piecetype]:
                             selected.SimSetPiece(piecedict[piecetype])
                             return (selected,squares[bestmoves[n][0]][bestmoves[n][1]])
                         else:
