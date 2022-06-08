@@ -1143,9 +1143,12 @@ def GetCPUMove(squares):
                         pos = selected.piece.pos
                         piecedict = {'king':King('player2',pos),'queen':Queen('player2',pos),'rook':Rook('player2',pos),'bishop':Bishop('player2',pos),'knight':Knight('player2',pos),'pawn':Pawn('player2',pos)}
                         selected.SimClearSquare()
-                        if isContested(squares,bestmoves[n],'player1') is True or rank[squares[bestmoves[n][0]][bestmoves[n][1]].piecetype] > rank[selected.piecetype]:
-                            selected.SimSetPiece(piecedict[piecetype])
-                            return (selected,squares[bestmoves[n][0]][bestmoves[n][1]])
+                        if squares[bestmoves[n][0]][bestmoves[n][1]].occupied:
+                            if isContested(squares,bestmoves[n],'player1') is True or rank[squares[bestmoves[n][0]][bestmoves[n][1]].piecetype] > rank[selected.piecetype]:
+                                selected.SimSetPiece(piecedict[piecetype])
+                                return (selected,squares[bestmoves[n][0]][bestmoves[n][1]])
+                            else:
+                                selected.SimSetPiece(piecedict[piecetype])
                         else:
                             selected.SimSetPiece(piecedict[piecetype])
                     else:
