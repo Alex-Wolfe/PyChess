@@ -4,17 +4,26 @@ complete
 
 Extras to do:
 flip board so that each player takes their turn from the same perspective
-add cpu defense mechanic so that it attempts to protect its high value pieces when they are in danger
-
 
 Simple CPU AI explanation
-a simple AI would prioritize the following moves
+CPU AI will prioritize the following moves
      1.) Putting enemy in checkmate
-     2.) Putting enemy in check
-     3.) Taking enemy piece (ranked by piece value in order of queen, rook, bishop, knight, pawn
-     4.) Castling if possible
-     5.) Else, make random move
+     2.) Pawn promotion (when pawn is one move away)
+     3.) Putting enemy in check (without throwing away pieces)
+     4.) Taking enemy piece or defending a threatened piece (ranked by piece value in order of queen, rook, bishop, knight, pawn)
+     5.) Castling if possible
+     6.) Else, make random move
 
-Extra AI Mechanics:   if a pawn is the most valuable piece the cpu can take, make random move
-               Never make a move to put the enemy in check if the position is contested by the enemy and not contested by self
-               only overtake into a contested square if the value of the captured enemy is greater than self
+Extra AI Explanation:   
+               Never make a move to put the enemy in check if the position is contested and the trade is not positive
+               Moves that put the enemy in check while also taking a more valuable enemy piece are more desirable
+               Moves that put the enemy in check while also taking a more valuable enemy piece without putting the ally piece
+                    in danger is highly desired
+               Taking more valuable enemy pieces is desired, but taking enemy pieces without entering a contested square is slightly better
+               Only overtake into a contested square if the value of the captured enemy is greater than self
+               Moving a highly valued ally piece out of danger is weighed against the value of taking an enemy piece, 
+                    however, moving an ally piece out of danger while also taking an enemy piece is supremely desired
+               Only make random moves that do not put the ally piece in danger
+
+Current problems:
+things sometimes get funny when cpu is put in check
