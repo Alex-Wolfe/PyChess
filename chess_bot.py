@@ -184,7 +184,10 @@ class Pawn():
         self.col = pos[0]
         self.row = pos[1]
         self.numberofmoves = 0
-
+    # Since get moves only returns the diagonal moves for a pawn when an enemy piece is capturable, a separate function was
+    # needed to test whether squares were contested by pawns. In other parts of the program, a square is checked for whether or not
+    # it is contested. Since this is based on the assumption that in the future, a piece may move there, this function is needed
+    # to test whether a piece that moves there in the future will be contested by a pawn
     def GetContestingMoves(self,squares,player):
         available = []
         self.col = self.pos[0]
@@ -205,7 +208,7 @@ class Pawn():
                     available.append([self.col-1, self.row+1])
         return available
 
-    # Gets all available moves that a piece can make. Not counting check limitations
+    # Gets all available moves that the piece can make. Not counting check limitations
     def GetMoves(self,squares,player):
         available = []
         self.col = self.pos[0]
@@ -266,6 +269,7 @@ class King():
         self.row = pos[1]
         self.numberofmoves = 0
 
+    # Gets all available moves that the piece can make. Not counting check limitations
     def GetMoves(self,squares,player):
         available = []
         self.col = self.pos[0]
@@ -320,6 +324,7 @@ class Queen():
         self.row = pos[1]
         self.numberofmoves = 0
 
+    # Gets all available moves that the piece can make. Not counting check limitations
     def GetMoves(self,squares,player):
         available = []
         self.col = self.pos[0]
@@ -412,6 +417,7 @@ class Knight():
         self.row = pos[1]
         self.numberofmoves = 0
 
+    # Gets all available moves that the piece can make. Not counting check limitations
     def GetMoves(self,squares,player):
         available = []
         self.col = self.pos[0]
@@ -452,6 +458,7 @@ class Bishop():
         self.row = pos[1]
         self.numberofmoves = 0
 
+    # Gets all available moves that the piece can make. Not counting check limitations
     def GetMoves(self,squares,player):
         available = []
         self.col = self.pos[0]
@@ -512,6 +519,7 @@ class Rook():
         self.row = pos[1]
         self.numberofmoves = 0
 
+    # Gets all available moves that the piece can make. Not counting check limitations
     def GetMoves(self,squares,player):
         available = []
         self.col = self.pos[0]
@@ -553,6 +561,7 @@ class Rook():
 
 # Functions List
 
+# Resets game board and score. Reinitializes all square objects and redraws them and other things on the screen
 def initializeGame(win,board,squaresize,team1color,team2color):
     board.player1score = 16
     board.player2score = 16
@@ -985,10 +994,12 @@ def UpdateScore(board,p1scorenumber,p2scorenumber):
     p2score = board.player2score
     p2scorenumber.setText(str(p2score))
 
-# Filters a set of available moves for a selected piece, removing moves 
-#   that would cause the player to put themself in check
-# Can be toggled between filtering for moves that do not put the player in check, and
-#   filtering for moves that do put the enemy in check
+# This function has two uses:
+# 1.) Filters a set of available moves for a selected piece, removing moves 
+#       that would cause the player to put themself in check
+# 2.) Filters a set of available moves for a selected piece, removing moves
+#       that do not put the enemy in check or checkmate
+# Can be toggled between the two uses by the "type" variable: 'd' for defensive filtering, 'a' for attacking filtering
 # Done by simulating the move on a copied (dummy) board, and running the inCheck function
 def SimulateforCheck(squares,availableprecheck,player,pos,type):
     passed = []
@@ -1040,7 +1051,7 @@ def SimulateforCheck(squares,availableprecheck,player,pos,type):
                         checkmates.append(availableprecheck[l])
         return (passed,checkmates)   
 
-# Adds move at rook to passed in moves if castling is a legal move
+# Adds move at rook to passed in moves if castling is a legal move. This function is not in GetMoves for king piece due to recursion issue
 def checkCastling(squares,moves,team,pos):
     finalmoves = moves
     if (squares[pos[0]+1][pos[1]].occupied is False and squares[pos[0]+3][pos[1]].occupied and squares[pos[0]+2][pos[1]].occupied is False and
@@ -1054,7 +1065,10 @@ def checkCastling(squares,moves,team,pos):
         finalmoves.append([pos[0]-4,pos[1]])
     return finalmoves
 
-# Bool function that checks if a square is contested by enemy  
+# Bool function that checks if a square is contested by enemy. 
+# In order to get an accurate result, this function temporarily clears the square in question if it is occupied
+# This is because pieces cannot move to squares with friendly pieces on them, but I wanted to know if that square is contested
+# after the piece on it may be captured
 def isContested(squares,pos,team):
     contested = []
     if squares[pos[0]][pos[1]].team != team and squares[pos[0]][pos[1]].occupied is True:
@@ -1292,7 +1306,7 @@ def GetCPUMove(squares):
         if len(castles) > 0:
             return (squares[kp2.pos[0]][kp2.pos[1]],squares[castles[0][0]][castles[0][1]])
     # Else, make random move but not into a contested square
-    # If in check, block the check with the least valuable piece possible
+    # If in check, block the check with the least valuable piece possible.
     if kp2.InCheck(squares) is False:
         while True:
             k = random.randint(0,8)
@@ -1329,7 +1343,7 @@ def GetCPUMove(squares):
                 available = SimulateforCheck(squares,availableprecheck,selected.team,selected.piece.pos,'d')
                 if len(available) == 0:
                     continue
-                # Look for the least valuable piece to move into harms way
+                # Look for the least valuable piece to move into harms way according to modified rank dict above
                 if rank[selected.piecetype] < leastexpensive:
                     for c in range(len(available)):
                         bestoption = available[c]
@@ -1377,13 +1391,16 @@ while True:
     available = []
     while turn == 'player1':
         UpdateScore(board,p1scorenumber,p2scorenumber)
+        # If in stalemate
         if CheckforMate(squares,turn):
             text.Stalemate(win,team1color)
             win.setBackground(team2color)
             turn = gameOver(win,windowsize,'orange')
             break
         click = win.getMouse()
+        # If clicked on draw move toggle option
         drawMoveToggle(board,click.x,click.y)
+        # If clicked on exit button
         if (exitButton(click.x,click.y)):
             turn = 'player1'
             text.Player1turn(win)
@@ -1397,26 +1414,32 @@ while True:
             break
         [col,row] = GetClickCoords(click)
         EraseMoveshapes(moveshapes)
+        # If second click is on one of the available moves gotten from the first click, perform that move
         if [col,row] in available:
             EraseMoveshapes(moveshapes)
             moveshapes = []
             available = []
             selected2 = squares[col][row]
+            # If capturing enemy piece
             if selected2.team == 'player2':
                 print('P1:',selected.piecetype,'to',selected2.pos,'captured',selected2.piecetype)
                 Overtake(selected,selected2,board,selected2.team)
+            # If moving to empty square
             elif selected2.occupied is False:
                 print('P1:',selected.piecetype,'to',selected2.pos)
                 Move(squares,selected,selected2,board)
+            # If caslting
             else:
                 print('P1: Castled')
                 Castle(squares,selected,selected2)
             turn = 'player2'
+            # After move is made, check for Check status on both teams
             if kp1.InCheck(squares) is False:
                 text.block2.undraw()
             if kp2.InCheck(squares) is False:
                 text.Player2turn(win)
                 break  
+            # If that move put the enemy in checkmate
             if CheckforMate(squares,turn):
                 text.Checkmate(win,team1color)
                 text.Player1win(win,team1color)
@@ -1426,6 +1449,7 @@ while True:
                 turn = gameOver(win,windowsize,'orange')
                 break
             text.Check(win)
+        # If first click is on a friendly piece, get that pieces available moves and draw them depending on draw move option
         elif squares[col][row].team == turn:
             selected = squares[col][row]
             EraseMoveshapes(moveshapes)
@@ -1434,19 +1458,23 @@ while True:
                 availableprecheck = checkCastling(squares,availableprecheck,selected.team,selected.pos)
             available = SimulateforCheck(squares,availableprecheck,selected.team,selected.piece.pos,'d')
             moveshapes = DrawAvailableMoves(available,squares,squaresize,win,board,selected)
+        # If click is not on friendly piece, do nothing and reset available moves
         else:
             available = []
             moveshapes = []
 
     while turn == 'player2' and mode == '2player':
         UpdateScore(board,p1scorenumber,p2scorenumber)
+        # If in stalemate
         if CheckforMate(squares,turn):
             text.Stalemate(win,team1color)
             win.setBackground(team2color)
             turn = gameOver(win,windowsize,'orange')
             break
         click = win.getMouse()
+        # If draw move toggle was clicked
         drawMoveToggle(board,click.x,click.y)
+        # If exit button was clicked
         if (exitButton(click.x,click.y)):
             turn = 'player1'
             text.Player1turn(win)
@@ -1460,26 +1488,32 @@ while True:
             break
         [col,row] = GetClickCoords(click)
         EraseMoveshapes(moveshapes)
+        # If second click is on one of the available moves gotten from the first click, perform that move
         if [col,row] in available:
             EraseMoveshapes(moveshapes)
             moveshapes = []
             available = []
             selected2 = squares[col][row]
+            # If capturing enemy piece
             if selected2.team == 'player1':
                 print('P2:',selected.piecetype,'to',selected2.pos,'captured',selected2.piecetype)
                 Overtake(selected,selected2,board,selected2.team)
+            # If moving to empty square
             elif selected2.occupied is False:
                 print('P2:',selected.piecetype,'to',selected2.pos)
                 Move(squares,selected,selected2,board)
+            # If castling
             else:
                 print('P2: Castled')
                 Castle(squares,selected,selected2)
             turn = 'player1'
+            # After move is made, check for Check status on both teams
             if kp2.InCheck(squares) is False:
                 text.block2.undraw()
             if kp1.InCheck(squares) is False:
                 text.Player1turn(win)
                 break
+            # If that move put the enemy in checkmate
             if CheckforMate(squares,turn):
                 text.Checkmate(win,team1color)
                 text.Player2win(win,team1color)
@@ -1489,6 +1523,7 @@ while True:
                 turn = gameOver(win,windowsize,'orange')
                 break
             text.Check(win)
+        # If first click is on a friendly piece, get that pieces available moves and draw them depending on draw move option
         elif squares[col][row].team == turn:
             selected = squares[col][row]
             EraseMoveshapes(moveshapes)
@@ -1497,6 +1532,7 @@ while True:
                 availableprecheck = checkCastling(squares,availableprecheck,selected.team,selected.pos)
             available = SimulateforCheck(squares,availableprecheck,selected.team,selected.piece.pos,'d')
             moveshapes = DrawAvailableMoves(available,squares,squaresize,win,board,selected)
+        # If click is not on friendly piece, do nothing and reset available moves
         else:
             available = []
             moveshapes = []
@@ -1504,6 +1540,7 @@ while True:
     while turn == 'player2' and mode == 'cpu':
         UpdateScore(board,p1scorenumber,p2scorenumber)
         time.sleep(1)
+        # Check for stalemate
         if CheckforMate(squares,turn):
             text.Stalemate(win,team1color)
             win.setBackground(team2color)
@@ -1511,24 +1548,30 @@ while True:
             break
         checkmoves = []
         available = []
+        # Call CPU algorithm to get the best move to perform
         (movefrom, moveto) = GetCPUMove(squares)
         selected = movefrom
         selected2 = moveto
+        # If capturing an enemy piece
         if selected2.team == 'player1':
             print('CPU:',movefrom.piecetype,'to',moveto.pos,'captured',selected2.piecetype)
             cpuOvertake(selected,selected2,board,selected2.team)
+        # If moving to empty square
         elif selected2.occupied is False:
             cpuMove(squares,selected,selected2,board)
             print('CPU:',movefrom.piecetype,'to',moveto.pos)
+        # If castling
         else:
             Castle(squares,selected,selected2)
             print('CPU: Castled')
         turn = 'player1'
+        # After move is made, check for Check status for both teams
         if kp2.InCheck(squares) is False:
             text.block2.undraw()
         if kp1.InCheck(squares) is False:
             text.Player1turn(win)
             break
+        # If that move put the player in checkmate
         if CheckforMate(squares,turn):
             text.Checkmate(win,team1color)
             text.Player2win(win,team1color)
@@ -1538,9 +1581,11 @@ while True:
             turn = gameOver(win,windowsize,'orange')
             break
         text.Check(win)
+    # If after game ended, player clicked on quit
     if turn == 'gameover':
         win.close()
         break
+    # If after game ended, player clicked on play again
     if turn == 'newgame':
             [squares,kp1,kp2] = initializeGame(win,board,squaresize,team1color,team2color)
             win.setBackground(team1color)
