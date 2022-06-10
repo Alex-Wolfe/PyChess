@@ -4,6 +4,8 @@ complete
 
 Extras to do:
 flip board so that each player takes their turn from the same perspective
+when deciding to defend a high value piece, either move away with or without taking an enemy piece, or
+attempt to find another ally piece that can capture the threat
 
 Simple CPU AI explanation
 CPU AI will prioritize the following moves
@@ -27,3 +29,5 @@ Extra AI Explanation:
 
 Current problems:
 cpu might not make move? Maybe?
+game crashed when only make available to get out of check involved putting cpu queen in danger
+

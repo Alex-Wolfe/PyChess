@@ -1194,6 +1194,7 @@ def GetCPUMove(squares):
     rank = {'queen':5,'rook':4,'bishop':3,'knight':2,'pawn':1,'king':0}
     for k in range(8):
         for j in range(8):
+            # Only look at ally pieces that have available moves
             selected = squares[k][j]
             if selected.occupied is False:
                 continue
@@ -1203,17 +1204,20 @@ def GetCPUMove(squares):
             available = SimulateforCheck(squares,availableprecheck,selected.team,selected.piece.pos,'d')
             if len(available) == 0:
                 continue
-            # Prioritize putting enemy in checkmate
+            # If there are any moves that result in a checkmate, perform them
             (checkmoves,checkmates) = SimulateforCheck(squares,available,selected.team,selected.piece.pos,'a')
             if len(checkmates) > 0:
                 return (selected,squares[checkmates[0][0]][checkmates[0][1]])
-            # Next, prioritize making a pawn promotion
+            # If there are any moves that result in the promotion of a pawn, do it
             if selected.piecetype == 'pawn':
                 for a in range(len(available)):
                     if available[a][1] == 7:
                         promotions = available[a]
                         promotionfrom = selected
-            # Prioritize putting enemy in check but not while sacrificing a piece without a good trade
+            # Evaluate score of all moves that result in a check: Store the best move
+            #   Never Check the enemy by moving into an unoccupied contested position (instant loss of piece)
+            #   Check moves that result in the taking of an enemy piece are better
+            #   Check moves that result in moving into an uncontested position are better
             for n in range(len(checkmoves)):
                 if isContested(squares,checkmoves[n],'player2') is True:
                     if squares[checkmoves[n][0]][checkmoves[n][1]].occupied:
@@ -1233,7 +1237,9 @@ def GetCPUMove(squares):
                         bestcheck = checkmoves[n]
                         bestcheckfrom = selected
                         highestcheck = 1
-            # Consider value of ally pieces that are threatened
+            # Consider value of ally pieces that are threatened: Store the most valuable defense
+            # Moves that get the ally piece out of danger are good
+            # Move that get the ally piece out of danger while also taking an enemy piece are best
             if isContested(squares,selected.piece.pos,'player2') and rank[selected.piecetype] > highestthreat:
                 for b in range(len(available)):
                     if isContested(squares,available[b],'player2') is False:
@@ -1244,7 +1250,9 @@ def GetCPUMove(squares):
                             bestdefense = available[b]
                             defensefrom = selected
                             highestthreat = rank[selected.piecetype] + rank[squares[available[b][0]][available[b][1]].piecetype]
-            # Next prioritize taking enemy piece in order of piece value
+            # Consider value of enemy pieces that can be captured: Store the most valuable capture
+            # If the capture results in the ally piece being in danger, only perform if the value of the captured enemy piece
+            #   is greater than the value of the ally piece used to capture it
             for i in range(len(available)):
                 option = squares[available[i][0]][available[i][1]]
                 if option.occupied:
@@ -1258,15 +1266,20 @@ def GetCPUMove(squares):
                             bestovertake = available[i]
                             bestfrom = selected
                             highestcapture = rank[option.piecetype]
+    # Prioritize capture of enemy queen
     if highestcapture == 5:
         return (bestfrom, squares[bestovertake[0]][bestovertake[1]])
+    # Next, prioritize pawn promotions (getting a ally queen)
     if len(promotions) > 0:
         return (promotionfrom,squares[promotions[0]][promotions[1]])
+    # Next, prioritze the best move that puts the enemy in check
     if len(bestcheck) > 0:
         return (bestcheckfrom,squares[bestcheck[0]][bestcheck[1]])
+    # Next, if the value of the highest capture outweighs the value of the ally pieces in danger, perform the capture
     if highestcapture >= highestthreat:
         if len(bestovertake) > 0:
             return (bestfrom, squares[bestovertake[0]][bestovertake[1]])
+    # If the ally piece in danger is more valueable than the best capture, make a move to defend it
     if highestthreat > highestcapture:
         if len(bestdefense) > 0:
             return (defensefrom,squares[bestdefense[0]][bestdefense[1]])
@@ -1288,12 +1301,19 @@ def GetCPUMove(squares):
         available = SimulateforCheck(squares,availableprecheck,selected.team,selected.piece.pos,'d')
         if len(available) == 0:
             continue
-        elif len(available) == 1 and isContested(squares,available[0],'player2') is False:
-            return (selected,squares[available[0][0]][available[0][1]])
+        if kp2.InCheck(squares) is False:
+            if len(available) == 1 and isContested(squares,available[0],'player2') is False:
+                return (selected,squares[available[0][0]][available[0][1]])
+            else:
+                n = random.randint(0,len(available)-1)
+                if isContested(squares,available[n],'player2') is False:
+                    return (selected,squares[available[n][0]][available[n][1]])
         else:
-            n = random.randint(0,len(available)-1)
-            if isContested(squares,available[n],'player2') is False:
-                return (selected,squares[available[n][0]][available[n][1]])
+            if len(available) == 1:
+                return (selected,squares[available[0][0]][available[0][1]])
+            else:
+                n = random.randint(0,len(available)-1)
+                return (selected,squares[available[n][0]][available[n][1]]) 
 
 
 
