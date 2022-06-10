@@ -27,7 +27,6 @@ Extra AI Explanation:
                Only make random moves that do not put the ally piece in danger
 
 
-Current problems:
-CPU castling is not working
+Known problems:
 
 

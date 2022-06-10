@@ -1403,10 +1403,13 @@ while True:
             available = []
             selected2 = squares[col][row]
             if selected2.team == 'player2':
+                print('P1:',selected.piecetype,'to',selected2.pos,'captured',selected2.piecetype)
                 Overtake(selected,selected2,board,selected2.team)
             elif selected2.occupied is False:
+                print('P1:',selected.piecetype,'to',selected2.pos)
                 Move(squares,selected,selected2,board)
             else:
+                print('P1: Castled')
                 Castle(squares,selected,selected2)
             turn = 'player2'
             if kp1.InCheck(squares) is False:
@@ -1463,10 +1466,13 @@ while True:
             available = []
             selected2 = squares[col][row]
             if selected2.team == 'player1':
+                print('P2:',selected.piecetype,'to',selected2.pos,'captured',selected2.piecetype)
                 Overtake(selected,selected2,board,selected2.team)
             elif selected2.occupied is False:
+                print('P2:',selected.piecetype,'to',selected2.pos)
                 Move(squares,selected,selected2,board)
             else:
+                print('P2: Castled')
                 Castle(squares,selected,selected2)
             turn = 'player1'
             if kp2.InCheck(squares) is False:
@@ -1506,13 +1512,17 @@ while True:
         checkmoves = []
         available = []
         (movefrom, moveto) = GetCPUMove(squares)
-        print(movefrom.piecetype,'to',moveto.pos)
         selected = movefrom
         selected2 = moveto
         if selected2.team == 'player1':
+            print('CPU:',movefrom.piecetype,'to',moveto.pos,'captured',selected2.piecetype)
             cpuOvertake(selected,selected2,board,selected2.team)
         elif selected2.occupied is False:
             cpuMove(squares,selected,selected2,board)
+            print('CPU:',movefrom.piecetype,'to',moveto.pos)
+        else:
+            Castle(squares,selected,selected2)
+            print('CPU: Castled')
         turn = 'player1'
         if kp2.InCheck(squares) is False:
             text.block2.undraw()
