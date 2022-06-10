@@ -4,8 +4,7 @@ complete
 
 Extras to do:
 flip board so that each player takes their turn from the same perspective
-when deciding to defend a high value piece, either move away with or without taking an enemy piece, or
-attempt to find another ally piece that can capture the threat
+
 
 Simple CPU AI explanation
 CPU AI will prioritize the following moves
@@ -27,7 +26,8 @@ Extra AI Explanation:
                     however, moving an ally piece out of danger while also taking an enemy piece is supremely desired
                Only make random moves that do not put the ally piece in danger
 
+
 Current problems:
-cpu might not make move? Maybe?
+CPU castling is not working
 
 
