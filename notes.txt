@@ -26,4 +26,4 @@ Extra AI Explanation:
                Only make random moves that do not put the ally piece in danger
 
 Current problems:
-things sometimes get funny when cpu is put in check
+cpu might not make move? Maybe?
