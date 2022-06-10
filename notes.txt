@@ -4,7 +4,8 @@ complete
 
 Extras to do:
 flip board so that each player takes their turn from the same perspective
-
+when a piece is trying to save itself, and there is no way out against a piece of same or less value, take that attacking
+piece even if it means losing the ally piece
 
 Simple CPU AI explanation
 CPU AI will prioritize the following moves

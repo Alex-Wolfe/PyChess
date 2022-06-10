@@ -86,7 +86,7 @@ def main():
             self.occupied = False
             self.team = 'none'
             self.piece = 'none'
-            self.pos = [0,0]
+            self.pos = [0, 0]
 
         def Draw(self,win,p1,p2,outline):
             self.p1 = p1
@@ -95,7 +95,7 @@ def main():
             square.setFill(self.color)
             square.setOutline(outline)
             square.draw(win)
-            self.center = graphics.Point((p1.x+p2.x)/2,(p1.y+p2.y)/2)
+            self.center = graphics.Point((p1.x + p2.x)/2,(p1.y + p2.y)/2)
 
         def SetColor(self,color):
             self.color = color
@@ -230,11 +230,11 @@ def main():
                 if self.col < 7 and self.row == 3:
                     if squares[self.col+1][self.row].occupied and squares[self.col+1][self.row].team != player:
                         if squares[self.col+1][self.row].piece.numberofmoves == 1:
-                            available.append([self.col+1,self.row-1])
+                            available.append([self.col+1, self.row-1])
                 if self.col > 0 and self.row == 3:
                     if squares[self.col-1][self.row].occupied and squares[self.col-1][self.row].team != player:
                         if squares[self.col-1][self.row].piece.numberofmoves == 1:
-                            available.append([self.col-1,self.row-1])
+                            available.append([self.col-1, self.row-1])
             else:
                 if self.numberofmoves == 0:
                     if self.row < 6:
@@ -252,11 +252,11 @@ def main():
                 if self.col < 7 and self.row == 4:
                     if self.row == 4 and squares[self.col+1][self.row].occupied and squares[self.col+1][self.row].team != player:
                         if squares[self.col+1][self.row].piece.numberofmoves == 1:
-                            available.append([self.col+1,self.row+1])
+                            available.append([self.col+1, self.row+1])
                 if self.col > 0 and self.row == 4:
                     if squares[self.col-1][self.row].occupied and squares[self.col-1][self.row].team != player:
                         if squares[self.col-1][self.row].piece.numberofmoves == 1:
-                            available.append([self.col-1,self.row+1])
+                            available.append([self.col-1, self.row+1])
             return available
 
 
@@ -307,8 +307,8 @@ def main():
                 for j in range(0,8):
                     if squares[k][j].occupied is True and squares[k][j].team != self.team:
                         results = squares[k][j].piece.GetMoves(squares,squares[k][j].team)
-                        for i in range(len(results)):
-                            contested.append(results[i])
+                        for i in results:
+                            contested.append(i)
             if self.pos in contested:
                 return True
             else:
@@ -375,33 +375,33 @@ def main():
                     break
             for k in range(self.row+1,8):
                 if squares[self.col][k].occupied is False:
-                    available.append([self.col,k])
+                    available.append([self.col, k])
                 elif squares[self.col][k].team != player:
-                    available.append([self.col,k])
+                    available.append([self.col, k])
                     break
                 else:
                     break
             for k in range(self.row-1,-1,-1):
                 if squares[self.col][k].occupied is False:
-                    available.append([self.col,k])
+                    available.append([self.col, k])
                 elif squares[self.col][k].team != player:
-                    available.append([self.col,k])
+                    available.append([self.col, k])
                     break
                 else:
                     break
             for k in range(self.col+1,8):
                 if squares[k][self.row].occupied is False:
-                    available.append([k,self.row])
+                    available.append([k, self.row])
                 elif squares[k][self.row].team != player:
-                    available.append([k,self.row])
+                    available.append([k, self.row])
                     break
                 else:
                     break
             for k in range(self.col-1,-1,-1):
                 if squares[k][self.row].occupied is False:
-                    available.append([k,self.row])
+                    available.append([k, self.row])
                 elif squares[k][self.row].team != player:
-                    available.append([k,self.row])
+                    available.append([k, self.row])
                     break
                 else:
                     break
@@ -424,25 +424,25 @@ def main():
             self.row = self.pos[1]
             if self.row > 0 and self.col > 1:
                 if squares[self.col-2][self.row-1].team != player:
-                    available.append([self.col-2,self.row-1])
+                    available.append([self.col-2, self.row-1])
             if self.row > 1 and self.col > 0:
                 if squares[self.col-1][self.row-2].team != player:
                     available.append([self.col-1, self.row-2])
             if self.row > 0 and self.col < 6:
                 if squares[self.col+2][self.row-1].team != player:
-                    available.append([self.col+2,self.row-1])
+                    available.append([self.col+2, self.row-1])
             if self.row > 1 and self.col < 7:
                 if squares[self.col+1][self.row-2].team != player:
                     available.append([self.col+1, self.row-2])      
             if self.row < 7 and self.col > 1:
                 if squares[self.col-2][self.row+1].team != player:
-                    available.append([self.col-2,self.row+1])
+                    available.append([self.col-2, self.row+1])
             if self.row < 6 and self.col > 0:
                 if squares[self.col-1][self.row+2].team != player:
                     available.append([self.col-1, self.row+2])
             if self.row < 7 and self.col < 6:
                 if squares[self.col+2][self.row+1].team != player:
-                    available.append([self.col+2,self.row+1])
+                    available.append([self.col+2, self.row+1])
             if self.row < 6 and self.col < 7:
                 if squares[self.col+1][self.row+2].team != player:
                     available.append([self.col+1, self.row+2]) 
@@ -526,33 +526,33 @@ def main():
             self.row = self.pos[1]
             for k in range(self.row+1,8):
                 if squares[self.col][k].occupied is False:
-                    available.append([self.col,k])
+                    available.append([self.col, k])
                 elif squares[self.col][k].team != player:
-                    available.append([self.col,k])
+                    available.append([self.col, k])
                     break
                 else:
                     break
             for k in range(self.row-1,-1,-1):
                 if squares[self.col][k].occupied is False:
-                    available.append([self.col,k])
+                    available.append([self.col, k])
                 elif squares[self.col][k].team != player:
-                    available.append([self.col,k])
+                    available.append([self.col, k])
                     break
                 else:
                     break
             for k in range(self.col+1,8):
                 if squares[k][self.row].occupied is False:
-                    available.append([k,self.row])
+                    available.append([k, self.row])
                 elif squares[k][self.row].team != player:
-                    available.append([k,self.row])
+                    available.append([k, self.row])
                     break
                 else:
                     break
             for k in range(self.col-1,-1,-1):
                 if squares[k][self.row].occupied is False:
-                    available.append([k,self.row])
+                    available.append([k, self.row])
                 elif squares[k][self.row].team != player:
-                    available.append([k,self.row])
+                    available.append([k, self.row])
                     break
                 else:
                     break
@@ -570,8 +570,8 @@ def main():
         squares = [[Square() for i in range(9)] for i in range(9)]
         for k in range(0,8):
             for j in range(0,8):
-                squares[k][j].pos = [k,j]
-                if (k+j) % 2:
+                squares[k][j].pos = [k, j]
+                if (k + j) % 2:
                     squares[k][j].SetColor(team2color)
                 else:
                     squares[k][j].SetColor(team1color)
@@ -580,43 +580,43 @@ def main():
                 squares[k][j].Draw(win,p1,p2,'black')
         # Assign Pieces to squares in starting configuration
         for k in range(0,8):
-            squares[k][6].SetPiece(win,Pawn('player1',[k,6]))
-            squares[k][1].SetPiece(win,Pawn('player2',[k,1]))  
-        squares[0][7].SetPiece(win,Rook('player1',[0,7]))
-        squares[7][7].SetPiece(win,Rook('player1',[7,7]))
-        squares[0][0].SetPiece(win,Rook('player2',[0,0]))
-        squares[7][0].SetPiece(win,Rook('player2',[7,0]))
-        squares[1][7].SetPiece(win,Knight('player1',[1,7]))
-        squares[6][7].SetPiece(win,Knight('player1',[6,7]))
-        squares[1][0].SetPiece(win,Knight('player2',[1,0]))
-        squares[6][0].SetPiece(win,Knight('player2',[6,0]))
-        squares[2][7].SetPiece(win,Bishop('player1',[2,7]))
-        squares[5][7].SetPiece(win,Bishop('player1',[5,7]))
-        squares[2][0].SetPiece(win,Bishop('player2',[2,0]))
-        squares[5][0].SetPiece(win,Bishop('player2',[5,0]))
-        squares[3][7].SetPiece(win,Queen('player1',[3,7]))
-        squares[3][0].SetPiece(win,Queen('player2',[3,0]))
-        kp1 = King('player1',[4,7])
-        kp2 = King('player2',[4,0])
+            squares[k][6].SetPiece(win,Pawn('player1',[k, 6]))
+            squares[k][1].SetPiece(win,Pawn('player2',[k, 1]))  
+        squares[0][7].SetPiece(win,Rook('player1',[0, 7]))
+        squares[7][7].SetPiece(win,Rook('player1',[7, 7]))
+        squares[0][0].SetPiece(win,Rook('player2',[0, 0]))
+        squares[7][0].SetPiece(win,Rook('player2',[7, 0]))
+        squares[1][7].SetPiece(win,Knight('player1',[1, 7]))
+        squares[6][7].SetPiece(win,Knight('player1',[6, 7]))
+        squares[1][0].SetPiece(win,Knight('player2',[1, 0]))
+        squares[6][0].SetPiece(win,Knight('player2',[6, 0]))
+        squares[2][7].SetPiece(win,Bishop('player1',[2, 7]))
+        squares[5][7].SetPiece(win,Bishop('player1',[5, 7]))
+        squares[2][0].SetPiece(win,Bishop('player2',[2, 0]))
+        squares[5][0].SetPiece(win,Bishop('player2',[5, 0]))
+        squares[3][7].SetPiece(win,Queen('player1',[3, 7]))
+        squares[3][0].SetPiece(win,Queen('player2',[3, 0]))
+        kp1 = King('player1',[4, 7])
+        kp2 = King('player2',[4, 0])
         squares[4][7].SetPiece(win,kp1)
         squares[4][0].SetPiece(win,kp2)
         drawMoveButton(win)
         drawexitButton(win)
-        return [squares,kp1,kp2]
+        return [squares, kp1, kp2]
 
     # Draws clickable piece images for promotion of pawns
     def drawPromoters(win,squaresize):
         promoters = ['knight_black.png','bishop_black.png','rook_black.png','queen_black.png','knight_white.png','bishop_white.png','rook_white.png','queen_white.png']
         for i in range(4):
-            p1 = graphics.Point(0,i*squaresize+3*squaresize)
-            p2 = graphics.Point(p1.x+squaresize,p1.y+squaresize)
-            center = graphics.Point((p1.x+p2.x)/2,(p1.y+p2.y)/2)
+            p1 = graphics.Point(0,i*squaresize + 3*squaresize)
+            p2 = graphics.Point(p1.x + squaresize,p1.y + squaresize)
+            center = graphics.Point((p1.x + p2.x)/2,(p1.y + p2.y)/2)
             image = graphics.Image(center,promoters[i])
             graphics.Image.draw(image,win)
         for k in range(4,8):
-            p1 = graphics.Point(9*squaresize,(k-4)*squaresize+3*squaresize)
-            p2 = graphics.Point(p1.x+squaresize,p1.y+squaresize)
-            center = graphics.Point((p1.x+p2.x)/2,(p1.y+p2.y)/2)
+            p1 = graphics.Point(9*squaresize,(k-4)*squaresize + 3*squaresize)
+            p2 = graphics.Point(p1.x + squaresize,p1.y + squaresize)
+            center = graphics.Point((p1.x + p2.x)/2,(p1.y + p2.y)/2)
             image = graphics.Image(center,promoters[k])
             graphics.Image.draw(image,win)
 
@@ -716,7 +716,7 @@ def main():
     # Draws quit to start menu button
     def drawexitButton(win):
         box = graphics.Rectangle(graphics.Point(30,720+10),graphics.Point(130,720-10))
-        q = graphics.Text(graphics.Point((box.p1.x+box.p2.x)/2,(box.p1.y+box.p2.y)/2),'Quit to Start')
+        q = graphics.Text(graphics.Point((box.p1.x + box.p2.x)/2,(box.p1.y + box.p2.y)/2),'Quit to Start')
         q.setSize(10)
         box.draw(win)
         q.draw(win)
@@ -731,38 +731,38 @@ def main():
     def DrawAvailableMoves(available,squares,squaresize,win,board,selected):
         moveshapes = []
         if board.drawmoves:
-            for k in range(len(available)):
-                if squares[available[k][0]][available[k][1]].occupied and squares[available[k][0]][available[k][1]].team != selected.team:
-                    moveshapes.append(graphics.Rectangle(squares[available[k][0]][available[k][1]].p1,squares[available[k][0]][available[k][1]].p2))
-                    moveshapes[k].setOutline('red')
-                    moveshapes[k].setWidth(3)
-                    moveshapes[k].draw(win)
-                elif squares[available[k][0]][available[k][1]].occupied:
-                    moveshapes.append(graphics.Circle(squares[available[k][0]][available[k][1]].center,squaresize/7))
-                    moveshapes[k].setFill('green')
-                    moveshapes[k].setWidth(3)
-                    moveshapes[k].draw(win)
-                elif selected.piecetype == 'pawn' and available[k][0] != selected.pos[0]:
-                    moveshapes.append(graphics.Rectangle(squares[available[k][0]][available[k][1]].p1,squares[available[k][0]][available[k][1]].p2))
-                    moveshapes[k].setOutline('red')
-                    moveshapes[k].setWidth(3)
-                    moveshapes[k].draw(win)
+            for i, k in enumerate(available):
+                if squares[k[0]][k[1]].occupied and squares[k[0]][k[1]].team != selected.team:
+                    moveshapes.append(graphics.Rectangle(squares[k[0]][k[1]].p1,squares[k[0]][k[1]].p2))
+                    moveshapes[i].setOutline('red')
+                    moveshapes[i].setWidth(3)
+                    moveshapes[i].draw(win)
+                elif squares[k[0]][k[1]].occupied:
+                    moveshapes.append(graphics.Circle(squares[k[0]][k[1]].center,squaresize/7))
+                    moveshapes[i].setFill('green')
+                    moveshapes[i].setWidth(3)
+                    moveshapes[i].draw(win)
+                elif selected.piecetype == 'pawn' and k[0] != selected.pos[0]:
+                    moveshapes.append(graphics.Rectangle(squares[k[0]][k[1]].p1,squares[k[0]][k[1]].p2))
+                    moveshapes[i].setOutline('red')
+                    moveshapes[i].setWidth(3)
+                    moveshapes[i].draw(win)
                 else:
-                    moveshapes.append(graphics.Circle(squares[available[k][0]][available[k][1]].center,squaresize/7))
-                    moveshapes[k].setFill('whitesmoke')
-                    moveshapes[k].draw(win)
+                    moveshapes.append(graphics.Circle(squares[k[0]][k[1]].center,squaresize/7))
+                    moveshapes[i].setFill('whitesmoke')
+                    moveshapes[i].draw(win)
         else:
-            for k in range(len(available)):
+            for i, k in enumerate(available):
                 moveshapes.append(graphics.Rectangle(selected.p1,selected.p2))
-                moveshapes[k].setOutline('darkorange')
-                moveshapes[k].setWidth(4)
-                moveshapes[k].draw(win)
+                moveshapes[i].setOutline('darkorange')
+                moveshapes[i].setWidth(4)
+                moveshapes[i].draw(win)
         return moveshapes
 
     # Erases display of available moves
     def EraseMoveshapes(moveshapes):
-        for k in range(len(moveshapes)):
-            moveshapes[k].undraw()
+        for k in moveshapes:
+            k.undraw()
 
     # Takes in click x and y pos, and outputs col and row that was clicked on
     def GetClickCoords(click):
@@ -770,7 +770,7 @@ def main():
         normy = click.y/squaresize
         col = int((normx-1) // 1)
         row = int((normy-1) // 1)
-        return [col,row]
+        return [col, row]
 
     # Castles the king and selected rook
     def Castle(squares,selected,selected2):
@@ -790,47 +790,47 @@ def main():
             text.Promotion(win)
             while True:
                 click = win.getMouse()
-                [x,y] = GetClickCoords(click)
+                [x, y] = GetClickCoords(click)
                 if team == 'player1':
-                    match [x,y]:
-                        case [8,2]:
+                    match [x, y]:
+                        case [8, 2]:
                             selected2.SetPiece(win,Knight('player1',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
-                        case [8,3]:
+                        case [8, 3]:
                             selected2.SetPiece(win,Bishop('player1',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
-                        case [8,4]:
+                        case [8, 4]:
                             selected2.SetPiece(win,Rook('player1',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
-                        case [8,5]:
+                        case [8, 5]:
                             selected2.SetPiece(win,Queen('player1',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
                 else:
-                    match [x,y]:
-                        case [-1,2]:
+                    match [x, y]:
+                        case [-1, 2]:
                             selected2.SetPiece(win,Knight('player2',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
-                        case [-1,3]:
+                        case [-1, 3]:
                             selected2.SetPiece(win,Bishop('player2',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
-                        case [-1,4]:
+                        case [-1, 4]:
                             selected2.SetPiece(win,Rook('player2',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
-                        case [-1,5]:
+                        case [-1, 5]:
                             selected2.SetPiece(win,Queen('player2',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
@@ -895,61 +895,61 @@ def main():
             text.Promotion(win)
             while True:
                 click = win.getMouse()
-                [x,y] = GetClickCoords(click)
+                [x, y] = GetClickCoords(click)
                 if selected.team == 'player1':
-                    match [x,y]:
-                        case [-1,3]:
+                    match [x, y]:
+                        case [-1, 3]:
                             selected2.ClearSquare()
                             selected2.SetPiece(win,Knight('player1',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
-                        case [-1,4]:
+                        case [-1, 4]:
                             selected2.ClearSquare()
                             selected2.SetPiece(win,Bishop('player1',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
-                        case [-1,5]:
+                        case [-1, 5]:
                             selected2.ClearSquare()
                             selected2.SetPiece(win,Rook('player1',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
-                        case [-1,6]:
+                        case [-1, 6]:
                             selected2.ClearSquare()
                             selected2.SetPiece(win,Queen('player1',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
                 else:
-                    match [x,y]:
-                        case [8,3]:
+                    match [x, y]:
+                        case [8, 3]:
                             selected2.ClearSquare()
                             selected2.SetPiece(win,Knight('player2',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
-                        case [8,4]:
+                        case [8, 4]:
                             selected2.ClearSquare()
                             selected2.SetPiece(win,Bishop('player2',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
-                        case [8,5]:
+                        case [8, 5]:
                             selected2.ClearSquare()
                             selected2.SetPiece(win,Rook('player2',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
-                        case [8,6]:
+                        case [8, 6]:
                             selected2.ClearSquare()
                             selected2.SetPiece(win,Queen('player2',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
         else:
-            selected2.piece.pos = [-1,-1]
+            selected2.piece.pos = [-1, -1]
             selected2.ClearSquare()
             selected2.SetPiece(win,selected.piece)
             selected.ClearSquare()
@@ -957,7 +957,7 @@ def main():
     # Simplified overtake function used in SimulateforCheck function
     def SimOvertake(selected,selected2):
         selected.piece.pos = selected2.piece.pos
-        selected2.piece.pos = [-1,-1]
+        selected2.piece.pos = [-1, -1]
         selected2.SimClearSquare()
         selected2.SimSetPiece(selected.piece)
         selected.SimClearSquare()
@@ -982,7 +982,7 @@ def main():
                 selected2.piece.numberofmoves = selected.piece.numberofmoves
                 selected.ClearSquare()
         else:
-            selected2.piece.pos = [-1,-1]
+            selected2.piece.pos = [-1, -1]
             selected2.ClearSquare()
             selected2.SetPiece(win,selected.piece)
             selected.ClearSquare()
@@ -1007,10 +1007,10 @@ def main():
         col = pos[0]
         row = pos[1]
         if type == 'd':
-            for l in range(len(availableprecheck)):
+            for l in availableprecheck:
                 dummysquares = copy.deepcopy(squares)
                 dummyselected = dummysquares[col][row]
-                dummyselected2 = dummysquares[availableprecheck[l][0]][availableprecheck[l][1]]
+                dummyselected2 = dummysquares[l[0]][l[1]]
                 if dummyselected2.occupied and dummyselected2.team != player:
                     SimOvertake(dummyselected,dummyselected2)
                 else:
@@ -1018,38 +1018,38 @@ def main():
                 if player == 'player1':
                     if dummyselected.piecetype == 'king':
                         if dummyselected2.piece.InCheck(dummysquares) is False:
-                            passed.append(availableprecheck[l])
+                            passed.append(l)
                     else:
                         if kp1.InCheck(dummysquares) is False:
-                            passed.append(availableprecheck[l])
+                            passed.append(l)
                 else:
                     if dummyselected.piecetype == 'king':
                         if dummyselected2.piece.InCheck(dummysquares) is False:
-                            passed.append(availableprecheck[l])
+                            passed.append(l)
                     else:
                         if kp2.InCheck(dummysquares) is False:
-                            passed.append(availableprecheck[l])
+                            passed.append(l)
             return passed
         elif type == 'a':
-            for l in range(len(availableprecheck)):
+            for l in availableprecheck:
                 dummysquares = copy.deepcopy(squares)
                 dummyselected = dummysquares[col][row]
-                dummyselected2 = dummysquares[availableprecheck[l][0]][availableprecheck[l][1]]
+                dummyselected2 = dummysquares[l[0]][l[1]]
                 if dummyselected2.occupied and dummyselected2.team != player:
                     SimOvertake(dummyselected,dummyselected2)
                 else:
                     SimMove(dummyselected,dummyselected2)
                 if player == 'player1':
                         if kp2.InCheck(dummysquares):
-                            passed.append(availableprecheck[l])
+                            passed.append(l)
                         if CheckforMate(dummysquares,'player2'):
-                            checkmates.append(availableprecheck[l])
+                            checkmates.append(l)
                 else:
                         if kp1.InCheck(dummysquares):
-                            passed.append(availableprecheck[l])
+                            passed.append(l)
                         if CheckforMate(dummysquares,'player1'):
-                            checkmates.append(availableprecheck[l])
-            return (passed,checkmates)   
+                            checkmates.append(l)
+            return passed, checkmates  
 
     # Adds move at rook to passed in moves if castling is a legal move. This function is not in GetMoves for king piece due to recursion issue
     def checkCastling(squares,moves,team,pos):
@@ -1071,12 +1071,13 @@ def main():
     # after the piece on it may be captured
     def isContested(squares,pos,team):
         contested = []
-        if squares[pos[0]][pos[1]].team != team and squares[pos[0]][pos[1]].occupied is True:
-            enemyteam = squares[pos[0]][pos[1]].team
-            piecetype = squares[pos[0]][pos[1]].piecetype
-            nummoves = squares[pos[0]][pos[1]].piece.numberofmoves
+        square = squares[pos[0]][pos[1]]
+        if square.team != team and square.occupied is True:
+            enemyteam = square.team
+            piecetype = square.piecetype
+            nummoves = square.piece.numberofmoves
             piecedict = {'king':King(enemyteam,pos),'queen':Queen(enemyteam,pos),'rook':Rook(enemyteam,pos),'bishop':Bishop(enemyteam,pos),'knight':Knight(enemyteam,pos),'pawn':Pawn(enemyteam,pos)}
-            squares[pos[0]][pos[1]].SimClearSquare()
+            square.SimClearSquare()
             for k in range(0,8):
                 for j in range(0,8):
                     if squares[k][j].occupied is True and squares[k][j].team != team:
@@ -1084,25 +1085,25 @@ def main():
                             results = squares[k][j].piece.GetContestingMoves(squares,squares[k][j].team)
                         else:
                             results = squares[k][j].piece.GetMoves(squares,squares[k][j].team)
-                        for i in range(len(results)):
-                            contested.append(results[i])
+                        for i in results:
+                            contested.append(i)
             if piecetype != 'king':
-                squares[pos[0]][pos[1]].SimSetPiece(piecedict[piecetype]) 
+                square.SimSetPiece(piecedict[piecetype]) 
             else:
                 if team == 'player1':
-                    squares[pos[0]][pos[1]].occupied = True
-                    squares[pos[0]][pos[1]].team = 'player2'
-                    squares[pos[0]][pos[1]].piece = kp2
+                    square.occupied = True
+                    square.team = 'player2'
+                    square.piece = kp2
                 else:
-                    squares[pos[0]][pos[1]].occupied = True
-                    squares[pos[0]][pos[1]].team = 'player1'
-                    squares[pos[0]][pos[1]].piece = kp1
-            squares[pos[0]][pos[1]].piece.numberofmoves = nummoves
+                    square.occupied = True
+                    square.team = 'player1'
+                    square.piece = kp1
+            square.piece.numberofmoves = nummoves
             if pos in contested:
                 return True
             else:
                 return False
-        elif squares[pos[0]][pos[1]].occupied is False:
+        elif square.occupied is False:
             for k in range(0,8):
                 for j in range(0,8):
                     if squares[k][j].occupied is True and squares[k][j].team != team:
@@ -1110,18 +1111,18 @@ def main():
                             results = squares[k][j].piece.GetContestingMoves(squares,squares[k][j].team)
                         else:
                             results = squares[k][j].piece.GetMoves(squares,squares[k][j].team)
-                        for i in range(len(results)):
-                            contested.append(results[i])
+                        for i in results:
+                            contested.append(i)
             if pos in contested:
                 return True
             else:
                 return False
         else:
-            allyteam = squares[pos[0]][pos[1]].team
-            piecetype = squares[pos[0]][pos[1]].piecetype
-            nummoves = squares[pos[0]][pos[1]].piece.numberofmoves
+            allyteam = square.team
+            piecetype = square.piecetype
+            nummoves = square.piece.numberofmoves
             piecedict = {'king':King(allyteam,pos),'queen':Queen(allyteam,pos),'rook':Rook(allyteam,pos),'bishop':Bishop(allyteam,pos),'knight':Knight(allyteam,pos),'pawn':Pawn(allyteam,pos)}
-            squares[pos[0]][pos[1]].SimClearSquare()
+            square.SimClearSquare()
             for k in range(0,8):
                 for j in range(0,8):
                     if squares[k][j].occupied is True and squares[k][j].team != team:
@@ -1129,20 +1130,20 @@ def main():
                             results = squares[k][j].piece.GetContestingMoves(squares,squares[k][j].team)
                         else:
                             results = squares[k][j].piece.GetMoves(squares,squares[k][j].team)
-                        for i in range(len(results)):
-                            contested.append(results[i])
+                        for i in results:
+                            contested.append(i)
             if piecetype != 'king':
-                squares[pos[0]][pos[1]].SimSetPiece(piecedict[piecetype]) 
+                square.SimSetPiece(piecedict[piecetype]) 
             else:
                 if team == 'player1':
-                    squares[pos[0]][pos[1]].occupied = True
-                    squares[pos[0]][pos[1]].team = 'player1'
-                    squares[pos[0]][pos[1]].piece = kp1
+                    square.occupied = True
+                    square.team = 'player1'
+                    square.piece = kp1
                 else:
-                    squares[pos[0]][pos[1]].occupied = True
-                    squares[pos[0]][pos[1]].team = 'player2'
-                    squares[pos[0]][pos[1]].piece = kp2
-            squares[pos[0]][pos[1]].piece.numberofmoves = nummoves
+                    square.occupied = True
+                    square.team = 'player2'
+                    square.piece = kp2
+            square.piece.numberofmoves = nummoves
             if pos in contested:
                 return True
             else:
@@ -1155,7 +1156,7 @@ def main():
                 if squares[n][m].team == player:
                     moves = squares[n][m].piece.GetMoves(squares,player)
                     remaining = SimulateforCheck(squares,moves,player,squares[n][m].piece.pos,'d')
-                    if len(remaining)>0:
+                    if remaining:
                         return False
         return True
 
@@ -1219,36 +1220,36 @@ def main():
                 if len(available) == 0:
                     continue
                 # If there are any moves that result in a checkmate, perform them
-                (checkmoves,checkmates) = SimulateforCheck(squares,available,selected.team,selected.piece.pos,'a')
-                if len(checkmates) > 0:
-                    return (selected,squares[checkmates[0][0]][checkmates[0][1]])
+                checkmoves, checkmates = SimulateforCheck(squares,available,selected.team,selected.piece.pos,'a')
+                if checkmates:
+                    return selected, squares[checkmates[0][0]][checkmates[0][1]]
                 # If there are any moves that result in the promotion of a pawn, do it
                 if selected.piecetype == 'pawn':
-                    for a in range(len(available)):
-                        if available[a][1] == 7:
-                            promotions = available[a]
+                    for a in available:
+                        if a[1] == 7:
+                            promotions = a
                             promotionfrom = selected
                 # Evaluate score of all moves that result in a check: Store the best move
                 #   Never Check the enemy by moving into an unoccupied contested position (instant loss of piece)
                 #   Check moves that result in the taking of an enemy piece are better
                 #   Check moves that result in moving into an uncontested position are better
-                for n in range(len(checkmoves)):
-                    if isContested(squares,checkmoves[n],'player2') is True:
-                        if squares[checkmoves[n][0]][checkmoves[n][1]].occupied:
-                            if (rank[squares[checkmoves[n][0]][checkmoves[n][1]].piecetype] > rank[selected.piecetype]
-                                and rank[squares[checkmoves[n][0]][checkmoves[n][1]].piecetype] > highestcheck):
-                                bestcheck = checkmoves[n]
+                for n in checkmoves:
+                    if isContested(squares,n,'player2') is True:
+                        if squares[n[0]][n[1]].occupied:
+                            if (rank[squares[n[0]][n[1]].piecetype] > rank[selected.piecetype]
+                                and rank[squares[n[0]][n[1]].piecetype] > highestcheck):
+                                bestcheck = n
                                 bestcheckfrom = selected
-                                highestcheck = rank[squares[checkmoves[n][0]][checkmoves[n][1]].piecetype]
+                                highestcheck = rank[squares[n[0]][n[1]].piecetype]
                     else:
                         # Best case: Put enemy in check by taking a piece, but not moving into contested square
-                        if squares[checkmoves[n][0]][checkmoves[n][1]].occupied:
-                            if rank[squares[checkmoves[n][0]][checkmoves[n][1]].piecetype] > highestcheck-1:
-                                bestcheck = checkmoves[n]
+                        if squares[n[0]][n[1]].occupied:
+                            if rank[squares[n[0]][n[1]].piecetype] > highestcheck-1:
+                                bestcheck = n
                                 bestcheckfrom = selected
-                                highestcheck = rank[squares[checkmoves[n][0]][checkmoves[n][1]].piecetype] + 1
+                                highestcheck = rank[squares[n[0]][n[1]].piecetype] + 1
                         elif highestcheck == 0:
-                            bestcheck = checkmoves[n]
+                            bestcheck = n
                             bestcheckfrom = selected
                             highestcheck = 1
                 # Consider value of ally pieces that are threatened: Store the most valuable defense
@@ -1256,55 +1257,55 @@ def main():
                 # Move that get the ally piece out of danger while also taking an enemy piece are best
                 if isContested(squares,selected.piece.pos,'player2') and rank[selected.piecetype] > highestthreat:
                     highestcapture = 0
-                    for b in range(len(available)):
-                        if isContested(squares,available[b],'player2') is False and highestcapture == 0:
-                            bestdefense = available[b]
+                    for b in available:
+                        if isContested(squares,b,'player2') is False and highestcapture == 0:
+                            bestdefense = b
                             defensefrom = selected
                             highestthreat = rank[selected.piecetype]
-                            if squares[available[b][0]][available[b][1]].occupied is True:
-                                bestdefense = available[b]
+                            if squares[b[0]][b[1]].occupied is True:
+                                bestdefense = b
                                 defensefrom = selected
-                                highestthreat = rank[selected.piecetype] + rank[squares[available[b][0]][available[b][1]].piecetype]
-                                highestcapture = rank[squares[available[b][0]][available[b][1]].piecetype]
+                                highestthreat = rank[selected.piecetype] + rank[squares[b[0]][b[1]].piecetype]
+                                highestcapture = rank[squares[b[0]][b[1]].piecetype]
                 # Consider value of enemy pieces that can be captured: Store the most valuable capture
                 # If the capture results in the ally piece being in danger, only perform if the value of the captured enemy piece
                 #   is greater than the value of the ally piece used to capture it
-                for i in range(len(available)):
-                    option = squares[available[i][0]][available[i][1]]
+                for i in available:
+                    option = squares[i[0]][i[1]]
                     if option.occupied:
-                        if isContested(squares,[available[i][0],available[i][1]],'player2') is False:
+                        if isContested(squares,[i[0], i[1]],'player2') is False:
                             if rank[option.piecetype] > highestcapture:
-                                bestovertake = available[i]
+                                bestovertake = i
                                 bestfrom = selected
                                 highestcapture = rank[option.piecetype]
                         else:
                             if rank[option.piecetype] > highestcapture and rank[option.piecetype] > rank[selected.piecetype]:
-                                bestovertake = available[i]
+                                bestovertake = i
                                 bestfrom = selected
                                 highestcapture = rank[option.piecetype]
         # Prioritize capture of enemy queen
-        if len(bestovertake) > 0:
+        if bestovertake:
             if highestcapture == 5:
-                return (bestfrom, squares[bestovertake[0]][bestovertake[1]])
+                return bestfrom, squares[bestovertake[0]][bestovertake[1]]
         # Next, prioritize pawn promotions (getting a ally queen)
-        if len(promotions) > 0:
-            return (promotionfrom,squares[promotions[0]][promotions[1]])
+        if promotions:
+            return promotionfrom, squares[promotions[0]][promotions[1]]
         # Next, prioritze the best move that puts the enemy in check
-        if len(bestcheck) > 0:
-            return (bestcheckfrom,squares[bestcheck[0]][bestcheck[1]])
+        if bestcheck:
+            return bestcheckfrom, squares[bestcheck[0]][bestcheck[1]]
         # Next, if the value of the highest capture outweighs the value of the ally pieces in danger, perform the capture
         if highestcapture >= highestthreat:
-            if len(bestovertake) > 0:
-                return (bestfrom, squares[bestovertake[0]][bestovertake[1]])
+            if bestovertake:
+                return bestfrom, squares[bestovertake[0]][bestovertake[1]]
         # If the ally piece in danger is more valueable than the best capture, make a move to defend it
         if highestthreat > highestcapture:
-            if len(bestdefense) > 0:
-                return (defensefrom,squares[bestdefense[0]][bestdefense[1]])
+            if bestdefense:
+                return defensefrom, squares[bestdefense[0]][bestdefense[1]]
         # Next prioritize castling
         if kp2.numberofmoves == 0:
             castles = checkCastling(squares,[],'player2',kp2.pos)
-            if len(castles) > 0:
-                return (squares[kp2.pos[0]][kp2.pos[1]],squares[castles[0][0]][castles[0][1]])
+            if castles:
+                return squares[kp2.pos[0]][kp2.pos[1]], squares[castles[0][0]][castles[0][1]]
         # Else, make random move but not into a contested square
         # If in check, block the check with the least valuable piece possible.
         if kp2.InCheck(squares) is False:
@@ -1321,11 +1322,11 @@ def main():
                 if len(available) == 0:
                     continue
                 if len(available) == 1 and isContested(squares,available[0],'player2') is False:
-                    return (selected,squares[available[0][0]][available[0][1]])
+                    return selected, squares[available[0][0]][available[0][1]]
                 else:
                     n = random.randint(0,len(available)-1)
                     if isContested(squares,available[n],'player2') is False:
-                        return (selected,squares[available[n][0]][available[n][1]])
+                        return selected, squares[available[n][0]][available[n][1]]
         else: 
             leastexpensive = 6
             bestoption = []
@@ -1345,11 +1346,11 @@ def main():
                         continue
                     # Look for the least valuable piece to move into harms way according to modified rank dict above
                     if rank[selected.piecetype] < leastexpensive:
-                        for c in range(len(available)):
-                            bestoption = available[c]
+                        for c in available:
+                            bestoption = c
                             bestoptionfrom = selected
                             leastexpensive = rank[selected.piecetype]
-            return (bestoptionfrom, squares[bestoption[0]][bestoption[1]])
+            return bestoptionfrom, squares[bestoption[0]][bestoption[1]]
 
 
 
@@ -1377,7 +1378,7 @@ def main():
     p2gamescore = 0
     gamescore = graphics.Text(graphics.Point(660, 20),(str(p1gamescore),'-',str(p2gamescore)))
     gamescore.draw(win)
-    [squares,kp1,kp2] = initializeGame(win,board,squaresize,team1color,team2color)
+    [squares, kp1, kp2] = initializeGame(win,board,squaresize,team1color,team2color)
 
 
 
@@ -1406,31 +1407,31 @@ def main():
                 text.Player1turn(win)
                 mode = StartMenu(win,windowsize)
                 gamescore.setText('0-0')
-                [squares,kp1,kp2] = initializeGame(win,board,squaresize,team1color,team2color)
+                [squares, kp1, kp2] = initializeGame(win,board,squaresize,team1color,team2color)
                 win.setBackground(team1color)
                 text.block2.undraw()
                 if mode == 'quit':
                     turn = 'gameover'
                 break
-            [col,row] = GetClickCoords(click)
+            [col, row] = GetClickCoords(click)
             EraseMoveshapes(moveshapes)
             # If second click is on one of the available moves gotten from the first click, perform that move
-            if [col,row] in available:
+            if [col, row] in available:
                 EraseMoveshapes(moveshapes)
                 moveshapes = []
                 available = []
                 selected2 = squares[col][row]
                 # If capturing enemy piece
                 if selected2.team == 'player2':
-                    print('P1:',selected.piecetype,'to',selected2.pos,'captured',selected2.piecetype)
+                    print(f"P1: {selected.piecetype} to {selected2.pos} captured {selected2.piecetype}")
                     Overtake(selected,selected2,board,selected2.team)
                 # If moving to empty square
                 elif selected2.occupied is False:
-                    print('P1:',selected.piecetype,'to',selected2.pos)
+                    print(f"P1: {selected.piecetype} to {selected2.pos}")
                     Move(squares,selected,selected2,board)
                 # If caslting
                 else:
-                    print('P1: Castled')
+                    print("P1: Castled")
                     Castle(squares,selected,selected2)
                 turn = 'player2'
                 # After move is made, check for Check status on both teams
@@ -1480,31 +1481,31 @@ def main():
                 text.Player1turn(win)
                 mode = StartMenu(win,windowsize)
                 gamescore.setText('0-0')
-                [squares,kp1,kp2] = initializeGame(win,board,squaresize,team1color,team2color)
+                [squares, kp1, kp2] = initializeGame(win,board,squaresize,team1color,team2color)
                 win.setBackground(team1color)
                 text.block2.undraw()
                 if mode == 'quit':
                     turn = 'gameover'
                 break
-            [col,row] = GetClickCoords(click)
+            [col, row] = GetClickCoords(click)
             EraseMoveshapes(moveshapes)
             # If second click is on one of the available moves gotten from the first click, perform that move
-            if [col,row] in available:
+            if [col, row] in available:
                 EraseMoveshapes(moveshapes)
                 moveshapes = []
                 available = []
                 selected2 = squares[col][row]
                 # If capturing enemy piece
                 if selected2.team == 'player1':
-                    print('P2:',selected.piecetype,'to',selected2.pos,'captured',selected2.piecetype)
+                    print(f"P2: {selected.piecetype} to {selected2.pos} :captured {selected2.piecetype}")
                     Overtake(selected,selected2,board,selected2.team)
                 # If moving to empty square
                 elif selected2.occupied is False:
-                    print('P2:',selected.piecetype,'to',selected2.pos)
+                    print(f"P2: {selected.piecetype} to {selected2.pos}")
                     Move(squares,selected,selected2,board)
                 # If castling
                 else:
-                    print('P2: Castled')
+                    print("P2: Castled")
                     Castle(squares,selected,selected2)
                 turn = 'player1'
                 # After move is made, check for Check status on both teams
@@ -1546,24 +1547,23 @@ def main():
                 win.setBackground(team2color)
                 turn = gameOver(win,windowsize,'orange')
                 break
-            checkmoves = []
             available = []
             # Call CPU algorithm to get the best move to perform
-            (movefrom, moveto) = GetCPUMove(squares)
+            movefrom, moveto = GetCPUMove(squares)
             selected = movefrom
             selected2 = moveto
             # If capturing an enemy piece
             if selected2.team == 'player1':
-                print('CPU:',movefrom.piecetype,'to',moveto.pos,'captured',selected2.piecetype)
+                print(f"CPU: {movefrom.piecetype} to {moveto.pos} :captured{selected2.piecetype}")
                 cpuOvertake(selected,selected2,board,selected2.team)
             # If moving to empty square
             elif selected2.occupied is False:
                 cpuMove(squares,selected,selected2,board)
-                print('CPU:',movefrom.piecetype,'to',moveto.pos)
+                print(f"CPU: {movefrom.piecetype} to {moveto.pos}")
             # If castling
             else:
                 Castle(squares,selected,selected2)
-                print('CPU: Castled')
+                print("CPU: Castled")
             turn = 'player1'
             # After move is made, check for Check status for both teams
             if kp2.InCheck(squares) is False:
@@ -1587,7 +1587,7 @@ def main():
             break
         # If after game ended, player clicked on play again
         if turn == 'newgame':
-                [squares,kp1,kp2] = initializeGame(win,board,squaresize,team1color,team2color)
+                [squares, kp1, kp2] = initializeGame(win,board,squaresize,team1color,team2color)
                 win.setBackground(team1color)
                 text.block2.undraw()
                 turn = 'player1'
