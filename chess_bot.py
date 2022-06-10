@@ -101,54 +101,20 @@ def main():
             self.color = color
 
         # Places a selected piece on a selected square
+        # Used to use a huge match case statement, now uses two dicts
         def SetPiece(self,win,piece):
             self.occupied = True
             self.piece = piece
             self.piecetype = piece.type
             self.team = piece.team
-            match self.piecetype:
-                case 'pawn':
-                    if self.team == 'player1':
-                        image = graphics.Image(self.center,'pawn_white.png')
-                        graphics.Image.draw(image,win)
-                    elif self.team == 'player2':
-                        image = graphics.Image(self.center,'pawn_black.png')
-                        graphics.Image.draw(image,win)
-                case 'king':
-                    if self.team == 'player1':
-                        image = graphics.Image(self.center,'king_white.png')
-                        graphics.Image.draw(image,win)
-                    elif self.team == 'player2':
-                        image = graphics.Image(self.center,'king_black.png')
-                        graphics.Image.draw(image,win)
-                case 'queen':
-                    if self.team == 'player1':
-                        image = graphics.Image(self.center,'queen_white.png')
-                        graphics.Image.draw(image,win)
-                    elif self.team == 'player2':
-                        image = graphics.Image(self.center,'queen_black.png')
-                        graphics.Image.draw(image,win)
-                case 'knight':
-                    if self.team == 'player1':
-                        image = graphics.Image(self.center,'knight_white.png')
-                        graphics.Image.draw(image,win)
-                    elif self.team == 'player2':
-                        image = graphics.Image(self.center,'knight_black.png')
-                        graphics.Image.draw(image,win)
-                case 'rook':
-                    if self.team == 'player1':
-                        image = graphics.Image(self.center,'rook_white.png')
-                        graphics.Image.draw(image,win)
-                    elif self.team == 'player2':
-                        image = graphics.Image(self.center,'rook_black.png')
-                        graphics.Image.draw(image,win)
-                case 'bishop':
-                    if self.team == 'player1':
-                        image = graphics.Image(self.center,'bishop_white.png')
-                        graphics.Image.draw(image,win)
-                    elif self.team == 'player2':
-                        image = graphics.Image(self.center,'bishop_black.png')
-                        graphics.Image.draw(image,win)
+            p1images = {'pawn':'pawn_white.png','king':'king_white.png','queen':'queen_white.png','knight':'knight_white.png','rook':'rook_white.png','bishop':'bishop_white.png'}
+            p2images = {'pawn':'pawn_black.png','king':'king_black.png','queen':'queen_black.png','knight':'knight_black.png','rook':'rook_black.png','bishop':'bishop_black.png'}
+            if self.team == 'player1':
+                image = graphics.Image(self.center,p1images[self.piecetype])
+                graphics.Image.draw(image,win)
+            elif self.team == 'player2':
+                image = graphics.Image(self.center,p2images[self.piecetype])
+                graphics.Image.draw(image,win)
 
         # Same as SetPiece, but without updating the piece images
         def SimSetPiece(self,piece):
@@ -161,13 +127,12 @@ def main():
             self.occupied = False
             self.team = 'none'
             self.piece = 'none'
-            match self.color:
-                case 'royalblue':
-                    image = graphics.Image(self.center,'royalblue.png')
-                    graphics.Image.draw(image,win)
-                case 'seashell':
-                    image = graphics.Image(self.center,'seashell.png')
-                    graphics.Image.draw(image,win)
+            if self.color == 'royalblue':
+                image = graphics.Image(self.center,'royalblue.png')
+                graphics.Image.draw(image,win)
+            else:
+                image = graphics.Image(self.center,'seashell.png')
+                graphics.Image.draw(image,win)
 
         def SimClearSquare(self):
             self.occupied = False
@@ -175,7 +140,6 @@ def main():
             self.piece = 'none'
 
             
-
     class Pawn():
         def __init__(self,team,pos):
             self.team = team
