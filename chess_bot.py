@@ -1331,13 +1331,6 @@ text.Player1turn(win)
 if mode == 'quit':
     turn = 'gameover'
 while True:
-    for a in range(8):
-        for b in range(8):
-            if squares[a][b].occupied:
-                print('square',squares[a][b].pos,'occupied by',squares[a][b].piecetype)
-            else:
-                print('square',squares[a][b].pos,'is empty')
-    print('kp2 at',kp2.pos)
     moveshapes = []
     available = []
     while turn == 'player1':
@@ -1492,7 +1485,6 @@ while True:
             gamescore.setText((str(p1gamescore),'-',str(p2gamescore)))
             turn = gameOver(win,windowsize,'orange')
             break
-        print('huh')
         text.Check(win)
     if turn == 'gameover':
         win.close()
