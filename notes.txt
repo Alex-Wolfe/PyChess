@@ -29,5 +29,5 @@ Extra AI Explanation:
 
 Current problems:
 cpu might not make move? Maybe?
-game crashed when only make available to get out of check involved putting cpu queen in danger
+
 
