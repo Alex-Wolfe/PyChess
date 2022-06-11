@@ -1220,17 +1220,26 @@ def main():
                 # Moves that get the ally piece out of danger are good
                 # Move that get the ally piece out of danger while also taking an enemy piece are best
                 if isContested(squares,selected.piece.pos,'player2') and rank[selected.piecetype] > highestthreat:
+                    highestsacrifice = 0
                     highestcapture = 0
+                    highestthreat = rank[selected.piecetype]
                     for b in available:
-                        if isContested(squares,b,'player2') is False and highestcapture == 0:
+                        if isContested(squares,b,'player2') is False and squares[b[0]][b[1]].occupied is False and highestcapture == 0:
                             bestdefense = b
                             defensefrom = selected
                             highestthreat = rank[selected.piecetype]
-                            if squares[b[0]][b[1]].occupied is True:
+                            highestcapture = 1
+                        elif isContested(squares,b,'player2') is False and squares[b[0]][b[1]].occupied is True and rank[squares[b[0]][b[1]].piecetype] > highestcapture:
+                            bestdefense = b
+                            defensefrom = selected
+                            highestthreat = rank[selected.piecetype] + rank[squares[b[0]][b[1]].piecetype]
+                            highestcapture = rank[squares[b[0]][b[1]].piecetype]
+                        elif isContested(squares,b,'player2') is True and squares[b[0]][b[1]].occupied is True and highestcapture == 0:
+                            if rank[squares[b[0]][b[1]].piecetype] > highestsacrifice:
                                 bestdefense = b
                                 defensefrom = selected
                                 highestthreat = rank[selected.piecetype] + rank[squares[b[0]][b[1]].piecetype]
-                                highestcapture = rank[squares[b[0]][b[1]].piecetype]
+                                highestsacrifice = rank[squares[b[0]][b[1]].piecetype]
                 # Consider value of enemy pieces that can be captured: Store the most valuable capture
                 # If the capture results in the ally piece being in danger, only perform if the value of the captured enemy piece
                 #   is greater than the value of the ally piece used to capture it
@@ -1518,7 +1527,7 @@ def main():
             selected2 = moveto
             # If capturing an enemy piece
             if selected2.team == 'player1':
-                print(f"CPU: {movefrom.piecetype} to {moveto.pos} :captured{selected2.piecetype}")
+                print(f"CPU: {movefrom.piecetype} to {moveto.pos} :captured {selected2.piecetype}")
                 cpuOvertake(selected,selected2,board,selected2.team)
             # If moving to empty square
             elif selected2.occupied is False:
