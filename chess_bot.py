@@ -2,10 +2,13 @@
 # Authored by Alex Wolfe on 5/29/2022
 
 
+import winsound
 import graphics
 import copy
 import random
 import time
+import pygame
+
 
 def main():
     # Classes List
@@ -1328,6 +1331,9 @@ def main():
 
 
     # Begin Game Setup
+    pygame.mixer.pre_init(44100, -16, 2, 2048)
+    pygame.mixer.init()
+    pygame.init()
     boardsize = 750
     windowsize = boardsize
     squaresize = boardsize/10
@@ -1396,25 +1402,27 @@ def main():
                 selected2 = squares[col][row]
                 # If capturing enemy piece
                 if selected2.team == 'player2':
-                    print(f"P1: {selected.piecetype} to {selected2.pos} captured {selected2.piecetype}")
+                    # print(f"P1: {selected.piecetype} to {selected2.pos} captured {selected2.piecetype}")
                     Overtake(selected,selected2,board,selected2.team)
                 # If moving to empty square
                 elif selected2.occupied is False:
-                    print(f"P1: {selected.piecetype} to {selected2.pos}")
+                    # print(f"P1: {selected.piecetype} to {selected2.pos}")
                     Move(squares,selected,selected2,board)
                 # If caslting
                 else:
-                    print("P1: Castled")
+                    # print("P1: Castled")
                     Castle(squares,selected,selected2)
                 turn = 'player2'
                 # After move is made, check for Check status on both teams
                 if kp1.InCheck(squares) is False:
                     text.block2.undraw()
                 if kp2.InCheck(squares) is False:
+                    winsound.PlaySound('p1movesound.wav',winsound.SND_ASYNC)
                     text.Player2turn(win)
                     break  
                 # If that move put the enemy in checkmate
                 if CheckforMate(squares,turn):
+                    winsound.PlaySound('checkmatesound.wav',winsound.SND_ASYNC)
                     text.Checkmate(win,team1color)
                     text.Player1win(win,team1color)
                     win.setBackground(team2color)
@@ -1422,6 +1430,7 @@ def main():
                     gamescore.setText((str(p1gamescore),'-',str(p2gamescore)))
                     turn = gameOver(win,windowsize,'orange')
                     break
+                winsound.PlaySound('checksound.wav',winsound.SND_ASYNC)
                 text.Check(win)
             # If first click is on a friendly piece, get that pieces available moves and draw them depending on draw move option
             elif squares[col][row].team == turn:
@@ -1470,25 +1479,27 @@ def main():
                 selected2 = squares[col][row]
                 # If capturing enemy piece
                 if selected2.team == 'player1':
-                    print(f"P2: {selected.piecetype} to {selected2.pos} :captured {selected2.piecetype}")
+                    # print(f"P2: {selected.piecetype} to {selected2.pos} :captured {selected2.piecetype}")
                     Overtake(selected,selected2,board,selected2.team)
                 # If moving to empty square
                 elif selected2.occupied is False:
-                    print(f"P2: {selected.piecetype} to {selected2.pos}")
+                    # print(f"P2: {selected.piecetype} to {selected2.pos}")
                     Move(squares,selected,selected2,board)
                 # If castling
                 else:
-                    print("P2: Castled")
+                    # print("P2: Castled")
                     Castle(squares,selected,selected2)
                 turn = 'player1'
                 # After move is made, check for Check status on both teams
                 if kp2.InCheck(squares) is False:
                     text.block2.undraw()
                 if kp1.InCheck(squares) is False:
+                    winsound.PlaySound('p2movesound.wav',winsound.SND_ASYNC)
                     text.Player1turn(win)
                     break
                 # If that move put the enemy in checkmate
                 if CheckforMate(squares,turn):
+                    winsound.PlaySound('checkmatesound.wav',winsound.SND_ASYNC)
                     text.Checkmate(win,team1color)
                     text.Player2win(win,team1color)
                     win.setBackground(team2color)
@@ -1496,6 +1507,7 @@ def main():
                     gamescore.setText((str(p1gamescore),'-',str(p2gamescore)))
                     turn = gameOver(win,windowsize,'orange')
                     break
+                winsound.PlaySound('checksound.wav',winsound.SND_ASYNC)
                 text.Check(win)
             # If first click is on a friendly piece, get that pieces available moves and draw them depending on draw move option
             elif squares[col][row].team == turn:
@@ -1527,25 +1539,27 @@ def main():
             selected2 = moveto
             # If capturing an enemy piece
             if selected2.team == 'player1':
-                print(f"CPU: {movefrom.piecetype} to {moveto.pos} :captured {selected2.piecetype}")
+                # print(f"CPU: {movefrom.piecetype} to {moveto.pos} :captured {selected2.piecetype}")
                 cpuOvertake(selected,selected2,board,selected2.team)
             # If moving to empty square
             elif selected2.occupied is False:
                 cpuMove(squares,selected,selected2,board)
-                print(f"CPU: {movefrom.piecetype} to {moveto.pos}")
+                # print(f"CPU: {movefrom.piecetype} to {moveto.pos}")
             # If castling
             else:
                 Castle(squares,selected,selected2)
-                print("CPU: Castled")
+                # print("CPU: Castled")
             turn = 'player1'
             # After move is made, check for Check status for both teams
             if kp2.InCheck(squares) is False:
                 text.block2.undraw()
             if kp1.InCheck(squares) is False:
+                winsound.PlaySound('p2movesound.wav',winsound.SND_ASYNC)
                 text.Player1turn(win)
                 break
             # If that move put the player in checkmate
             if CheckforMate(squares,turn):
+                winsound.PlaySound('checkmatesound.wav',winsound.SND_ASYNC)
                 text.Checkmate(win,team1color)
                 text.Player2win(win,team1color)
                 win.setBackground(team2color)
@@ -1553,6 +1567,7 @@ def main():
                 gamescore.setText((str(p1gamescore),'-',str(p2gamescore)))
                 turn = gameOver(win,windowsize,'orange')
                 break
+            winsound.PlaySound('checksound.wav',winsound.SND_ASYNC)
             text.Check(win)
         # If after game ended, player clicked on quit
         if turn == 'gameover':
@@ -1565,7 +1580,6 @@ def main():
                 text.block2.undraw()
                 turn = 'player1'
                 text.Player1turn(win)
-
 
 
 
