@@ -862,25 +862,25 @@ def main():
                 [x, y] = GetClickCoords(click)
                 if selected.team == 'player1':
                     match [x, y]:
-                        case [-1, 3]:
+                        case [8, 2]:
                             selected2.ClearSquare()
                             selected2.SetPiece(win,Knight('player1',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
-                        case [-1, 4]:
+                        case [8, 3]:
                             selected2.ClearSquare()
                             selected2.SetPiece(win,Bishop('player1',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
-                        case [-1, 5]:
+                        case [8, 4]:
                             selected2.ClearSquare()
                             selected2.SetPiece(win,Rook('player1',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
-                        case [-1, 6]:
+                        case [8, 5]:
                             selected2.ClearSquare()
                             selected2.SetPiece(win,Queen('player1',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
@@ -888,25 +888,25 @@ def main():
                             break
                 else:
                     match [x, y]:
-                        case [8, 3]:
+                        case [-1, 2]:
                             selected2.ClearSquare()
                             selected2.SetPiece(win,Knight('player2',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
-                        case [8, 4]:
+                        case [-1, 3]:
                             selected2.ClearSquare()
                             selected2.SetPiece(win,Bishop('player2',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
-                        case [8, 5]:
+                        case [-1, 4]:
                             selected2.ClearSquare()
                             selected2.SetPiece(win,Rook('player2',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
                             selected.ClearSquare()
                             break
-                        case [8, 6]:
+                        case [-1, 5]:
                             selected2.ClearSquare()
                             selected2.SetPiece(win,Queen('player2',selected.piece.pos))
                             selected2.piece.numberofmoves = selected.piece.numberofmoves
