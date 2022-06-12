@@ -5,5 +5,7 @@ Play against a friend, or challenge the CPU!
 
 
 Extra modules List:
-   graphic.py ( For drawing the game board and objects ) /n
+
+   graphic.py ( For drawing the game board and objects )
+   
    pygame ( For latency free sound effects )
