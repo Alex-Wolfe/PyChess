@@ -1278,7 +1278,7 @@ def main():
             if bestdefense:
                 return defensefrom, squares[bestdefense[0]][bestdefense[1]]
         # Next prioritize castling
-        if kp2.numberofmoves == 0:
+        if kp2.numberofmoves == 0 and kp2.InCheck(squares) is False:
             castles = checkCastling(squares,[],'player2',kp2.pos)
             if castles:
                 return squares[kp2.pos[0]][kp2.pos[1]], squares[castles[0][0]][castles[0][1]]
@@ -1437,7 +1437,7 @@ def main():
                 selected = squares[col][row]
                 EraseMoveshapes(moveshapes)
                 availableprecheck = selected.piece.GetMoves(squares,selected.team)
-                if selected.piecetype == 'king' and selected.piece.numberofmoves == 0:
+                if selected.piecetype == 'king' and selected.piece.numberofmoves == 0 and kp1.InCheck(squares) is False:
                     availableprecheck = checkCastling(squares,availableprecheck,selected.team,selected.pos)
                 available = SimulateforCheck(squares,availableprecheck,selected.team,selected.piece.pos,'d')
                 moveshapes = DrawAvailableMoves(available,squares,squaresize,win,board,selected)
@@ -1514,7 +1514,7 @@ def main():
                 selected = squares[col][row]
                 EraseMoveshapes(moveshapes)
                 availableprecheck = selected.piece.GetMoves(squares,selected.team)
-                if selected.piecetype == 'king' and selected.piece.numberofmoves == 0:
+                if selected.piecetype == 'king' and selected.piece.numberofmoves == 0 and kp2.InCheck(squares) is False:
                     availableprecheck = checkCastling(squares,availableprecheck,selected.team,selected.pos)
                 available = SimulateforCheck(squares,availableprecheck,selected.team,selected.piece.pos,'d')
                 moveshapes = DrawAvailableMoves(available,squares,squaresize,win,board,selected)
