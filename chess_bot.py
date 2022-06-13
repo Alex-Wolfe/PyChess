@@ -750,11 +750,28 @@ def main():
 
     # Moves a piece to an empty square, and checks for promotion of pawn and checks for en passant
     def Move(squares,selected,selected2,board):
+        highlights = []
         team = selected.team
         selected.piece.pos = selected2.pos
         selected.piece.numberofmoves+=1
         if (selected.piecetype == 'pawn' and (selected.piece.pos[1] == 7 or selected.piece.pos[1] == 0)):
             text.Promotion(win)
+            if selected.team == 'player1':
+                for k in range(4):
+                    p1 = graphics.Point(9*squaresize,k*squaresize + 3*squaresize)
+                    p2 = graphics.Point(p1.x + squaresize,p1.y + squaresize)
+                    highlights.append(graphics.Rectangle(p1,p2))
+                    highlights[k].setOutline('darkorange')
+                    highlights[k].setWidth(4)
+                    highlights[k].draw(win)
+            else:
+                for k in range(4):
+                    p1 = graphics.Point(0,k*squaresize + 3*squaresize)
+                    p2 = graphics.Point(p1.x + squaresize,p1.y + squaresize)
+                    highlights.append(graphics.Rectangle(p1,p2))
+                    highlights[k].setOutline('darkorange')
+                    highlights[k].setWidth(4)
+                    highlights[k].draw(win)
             while True:
                 click = win.getMouse()
                 [x, y] = GetClickCoords(click)
@@ -814,6 +831,8 @@ def main():
         else:
             selected2.SetPiece(win,selected.piece)
             selected.ClearSquare()
+        for k in highlights:
+            k.undraw()
 
     # Simplified move function used in SimulateforCheck function
     def SimMove(selected,selected2):
@@ -852,6 +871,7 @@ def main():
 
     # Moves a piece to a occupied square, capturing the enemy piece. Checks for promotion of pawn
     def Overtake(selected,selected2,board,team):
+        highlights = []
         if team == 'player1':
             board.player1score-=1
         else:
@@ -860,6 +880,22 @@ def main():
         selected.piece.pos = selected2.piece.pos
         if (selected.piecetype == 'pawn' and (selected2.piece.row == 7 or selected2.piece.row == 0)):
             text.Promotion(win)
+            if selected.team == 'player1':
+                for k in range(4):
+                    p1 = graphics.Point(9*squaresize,k*squaresize + 3*squaresize)
+                    p2 = graphics.Point(p1.x + squaresize,p1.y + squaresize)
+                    highlights.append(graphics.Rectangle(p1,p2))
+                    highlights[k].setOutline('darkorange')
+                    highlights[k].setWidth(4)
+                    highlights[k].draw(win)
+            else:
+                for k in range(4):
+                    p1 = graphics.Point(0,k*squaresize + 3*squaresize)
+                    p2 = graphics.Point(p1.x + squaresize,p1.y + squaresize)
+                    highlights.append(graphics.Rectangle(p1,p2))
+                    highlights[k].setOutline('darkorange')
+                    highlights[k].setWidth(4)
+                    highlights[k].draw(win)
             while True:
                 click = win.getMouse()
                 [x, y] = GetClickCoords(click)
@@ -920,6 +956,8 @@ def main():
             selected2.ClearSquare()
             selected2.SetPiece(win,selected.piece)
             selected.ClearSquare()
+        for k in highlights:
+            k.undraw()
 
     # Simplified overtake function used in SimulateforCheck function
     def SimOvertake(selected,selected2):
