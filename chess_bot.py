@@ -1,5 +1,6 @@
 # PyChess
 # Authored by Alex Wolfe on 5/29/2022
+# Play a chess game against a friend, or against the computer!
 
 
 import winsound
